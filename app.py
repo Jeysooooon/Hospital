@@ -4,11 +4,10 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Configuración de la conexión a la base de datos
 DB_HOST = os.environ.get('MYSQLHOST', 'localhost')
 DB_USER = os.environ.get('MYSQLUSER', 'root')
 DB_PASSWORD = os.environ.get('MYSQLPASSWORD', '')
-DB_NAME = os.environ.get('MYSQLDATABASE', 'ProHospital')
+DB_NAME = os.environ.get('MYSQLDATABASE', 'railway') 
 DB_PORT = os.environ.get('MYSQLPORT', 3306)
 
 def get_db_connection():
@@ -18,12 +17,9 @@ def get_db_connection():
         password=DB_PASSWORD,
         database=DB_NAME,
         port=DB_PORT,
-        ssl_disabled=True # Ajusta esto si Railway exige SSL más adelante
+        ssl_disabled=True
     )
 
-# ==========================================
-# RUTA PRINCIPAL (DASHBOARD)
-# ==========================================
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -63,9 +59,10 @@ def especialidad_editar(codigo):
         cursor.execute("SELECT * FROM especialidad WHERE EspCodigo = %s", (codigo,))
         especialidad = cursor.fetchone()
         cursor.close()
-        conn.close
+        conn.close()
         return render_template('especialidad/editar.html', especialidad=especialidad)
     elif request.method == 'POST':
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['EspNombre']
         descripcion = request.form['EspDescripcion']
@@ -83,8 +80,10 @@ def especialidad_eliminar(codigo):
         cursor.execute("SELECT * FROM especialidad WHERE EspCodigo = %s", (codigo,))
         especialidad = cursor.fetchone()
         cursor.close()
+        conn.close()
         return render_template('especialidad/eliminar.html', especialidad=especialidad)
     elif request.method == 'POST':
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM especialidad WHERE EspCodigo=%s", (codigo,))
         conn.commit()
@@ -127,12 +126,14 @@ def doctores_agregar():
 def doctores_editar(codigo):
     if request.method == 'GET':
         conn = get_db_connection()
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM doctores WHERE DocCodigo = %s", (codigo,))
         doctor = cursor.fetchone()
         cursor.close()
         conn.close()
         return render_template('doctores/editar.html', doctor=doctor)
     elif request.method == 'POST':
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['DocNombre']
         apellido = request.form['DocApellido']
@@ -150,11 +151,14 @@ def doctores_editar(codigo):
 def doctores_eliminar(codigo):
     if request.method == 'GET':
         conn = get_db_connection()
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM doctores WHERE DocCodigo = %s", (codigo,))
         doctor = cursor.fetchone()
         cursor.close()
+        conn.close()
         return render_template('doctores/eliminar.html', doctor=doctor)
     elif request.method == 'POST':
+        conn = get_db_connection() 
         cursor = conn.cursor()
         cursor.execute("DELETE FROM doctores WHERE DocCodigo=%s", (codigo,))
         conn.commit()
@@ -199,11 +203,12 @@ def pacientes_editar(codigo):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM pacientes WHERE PacCodigo = %s", (codigo,))
-        paciente = cur.fetchone()
+        paciente = cursor.fetchone()
         cursor.close()
         conn.close()
         return render_template('pacientes/editar.html', paciente=paciente)
     elif request.method == 'POST':
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['PacNombre']
         apellido = request.form['PacApellido']
@@ -225,8 +230,10 @@ def pacientes_eliminar(codigo):
         cursor.execute("SELECT * FROM pacientes WHERE PacCodigo = %s", (codigo,))
         paciente = cursor.fetchone()
         cursor.close()
+        conn.close() 
         return render_template('pacientes/eliminar.html', paciente=paciente)
     elif request.method == 'POST':
+        conn = get_db_connection() 
         cursor = conn.cursor()
         cursor.execute("DELETE FROM pacientes WHERE PacCodigo=%s", (codigo,))
         conn.commit()
@@ -235,6 +242,5 @@ def pacientes_eliminar(codigo):
         return redirect(url_for('pacientes_index'))
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)
