@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 import mysql.connector
 
@@ -7,7 +8,7 @@ app = Flask(__name__)
 DB_HOST = os.environ.get('MYSQLHOST', 'localhost')
 DB_USER = os.environ.get('MYSQLUSER', 'root')
 DB_PASSWORD = os.environ.get('MYSQLPASSWORD', '')
-DB_NAME = os.environ.get('MYSQLDATABASE', 'ProHospital')
+DB_NAME = os.environ.get('MYSQLDATABASE', 'Hospital')
 DB_PORT = os.environ.get('MYSQLPORT', 3306)
 
 def get_db_connection():
@@ -234,8 +235,6 @@ def pacientes_eliminar(codigo):
         return redirect(url_for('pacientes_index'))
 
 if __name__ == "__main__":
+    import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
-    app.jinja_env.auto_reload = True
-    app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=False)
