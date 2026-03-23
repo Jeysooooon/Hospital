@@ -4,8 +4,6 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Configuración de la conexión a la base de datos
-# Railway usa 'railway' como nombre de DB por defecto.
 DB_HOST = os.environ.get('MYSQLHOST', 'localhost')
 DB_USER = os.environ.get('MYSQLUSER', 'root')
 DB_PASSWORD = os.environ.get('MYSQLPASSWORD', '')
@@ -42,7 +40,7 @@ def especialidad_index():
 @app.route("/especialidad/agregar", methods=["GET", "POST"])
 def especialidad_agregar():
     if request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['EspNombre']
         descripcion = request.form['EspDescripcion']
@@ -64,7 +62,7 @@ def especialidad_editar(codigo):
         conn.close()
         return render_template('especialidad/editar.html', especialidad=especialidad)
     elif request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['EspNombre']
         descripcion = request.form['EspDescripcion']
@@ -85,7 +83,7 @@ def especialidad_eliminar(codigo):
         conn.close()
         return render_template('especialidad/eliminar.html', especialidad=especialidad)
     elif request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM especialidad WHERE EspCodigo=%s", (codigo,))
         conn.commit()
@@ -128,14 +126,14 @@ def doctores_agregar():
 def doctores_editar(codigo):
     if request.method == 'GET':
         conn = get_db_connection()
-        cursor = conn.cursor() # Cursor añadido
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM doctores WHERE DocCodigo = %s", (codigo,))
         doctor = cursor.fetchone()
         cursor.close()
         conn.close()
         return render_template('doctores/editar.html', doctor=doctor)
     elif request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['DocNombre']
         apellido = request.form['DocApellido']
@@ -153,14 +151,14 @@ def doctores_editar(codigo):
 def doctores_eliminar(codigo):
     if request.method == 'GET':
         conn = get_db_connection()
-        cursor = conn.cursor() # Cursor añadido
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM doctores WHERE DocCodigo = %s", (codigo,))
         doctor = cursor.fetchone()
         cursor.close()
         conn.close()
         return render_template('doctores/eliminar.html', doctor=doctor)
     elif request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM doctores WHERE DocCodigo=%s", (codigo,))
         conn.commit()
@@ -205,12 +203,12 @@ def pacientes_editar(codigo):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM pacientes WHERE PacCodigo = %s", (codigo,))
-        paciente = cursor.fetchone() # Corregido: antes decía cur.fetchone
+        paciente = cursor.fetchone()
         cursor.close()
         conn.close()
         return render_template('pacientes/editar.html', paciente=paciente)
     elif request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form['PacNombre']
         apellido = request.form['PacApellido']
@@ -235,7 +233,7 @@ def pacientes_eliminar(codigo):
         conn.close()
         return render_template('pacientes/eliminar.html', paciente=paciente)
     elif request.method == 'POST':
-        conn = get_db_connection() # Conexión añadida
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM pacientes WHERE PacCodigo=%s", (codigo,))
         conn.commit()
