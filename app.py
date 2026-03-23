@@ -8,7 +8,7 @@ app = Flask(__name__)
 DB_HOST = os.environ.get('MYSQLHOST', 'localhost')
 DB_USER = os.environ.get('MYSQLUSER', 'root')
 DB_PASSWORD = os.environ.get('MYSQLPASSWORD', '')
-DB_NAME = os.environ.get('MYSQLDATABASE', 'Hospital')
+DB_NAME = os.environ.get('MYSQLDATABASE', 'railway')
 DB_PORT = os.environ.get('MYSQLPORT', 3306)
 
 def get_db_connection():
