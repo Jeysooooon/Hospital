@@ -19,7 +19,7 @@ def get_db_connection():
         password=DB_PASSWORD,
         database=DB_NAME,
         port=DB_PORT,
-        ssl_disabled=True
+        auth_plugin='GhHcNmQnHwjzetZmqNCjJPHTBjjnJdIt'
     )
 
 @app.route("/")
@@ -245,4 +245,4 @@ def pacientes_eliminar(codigo):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=False) # Puerto corregido
+    app.run(host='0.0.0.0', port=port, debug=False) 
