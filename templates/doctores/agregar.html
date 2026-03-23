@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Doctor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+    <h3>Agregar Doctor</h3>
+    <form action="/doctores/agregar" method="POST" class="card p-4 shadow-sm w-50">
+        <div class="mb-2"><label>Nombre:</label><input type="text" name="DocNombre" class="form-control" required></div>
+        <div class="mb-2"><label>Apellido:</label><input type="text" name="DocApellido" class="form-control" required></div>
+        <div class="mb-2"><label>Especialidad:</label><input type="text" name="DocEspecialidad" class="form-control" required></div>
+        <div class="mb-2"><label>Teléfono:</label><input type="text" name="DocTelefono" class="form-control"></div>
+        <div class="mb-3"><label>Correo:</label><input type="email" name="DocCorreo" class="form-control"></div>
+        <div>
+            <input type="submit" value="Guardar" class="btn btn-success">
+            <a href="/doctores/" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</body>
+</html>

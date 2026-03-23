@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pacientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+    <h3>Listado de Pacientes</h3>
+    <a href="/pacientes/agregar" class="btn btn-info text-white mb-3">Nuevo Paciente</a>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Código</th><th>Nombre</th><th>Apellido</th><th>DNI</th><th>Teléfono</th><th>Dirección</th><th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pac in lista_pacientes %}
+            <tr>
+                <td>{{ pac.0 }}</td><td>{{ pac.1 }}</td><td>{{ pac.2 }}</td><td>{{ pac.3 }}</td><td>{{ pac.4 }}</td><td>{{ pac.5 }}</td>
+                <td>
+                    <a href="/pacientes/editar/{{ pac.0 }}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="/pacientes/eliminar/{{ pac.0 }}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/" class="btn btn-secondary">Volver al Inicio</a>
+</body>
+</html>

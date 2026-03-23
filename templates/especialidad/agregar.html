@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Especialidad</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+    <h3>Agregar Especialidad</h3>
+    <form action="/especialidad/agregar" method="POST" class="card p-4 shadow-sm w-50">
+        <div class="mb-3">
+            <label>Nombre de la Especialidad:</label>
+            <input type="text" name="EspNombre" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Descripción:</label>
+            <textarea name="EspDescripcion" class="form-control" rows="3" required></textarea>
+        </div>
+        <div>
+            <input type="submit" value="Guardar" class="btn btn-success">
+            <a href="/especialidad/" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</body>
+</html>
