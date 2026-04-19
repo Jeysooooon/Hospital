@@ -5,7 +5,7 @@
 {% block content %}
 <section class="hero-panel">
     <span class="eyebrow">Panel principal</span>
-    <h1 class="hero-title">Administra tu hospital desde un panel claro, ordenado y fácil de usar.</h1>
+    <h1 class="hero-title">BIENVENIDOS A PROHOSPITAL!</h1>
     <p class="hero-text">
         Centraliza especialidades, doctores, pacientes y citas en un solo lugar para trabajar más rápido y con menos distracciones.
     </p>
@@ -13,6 +13,13 @@
         <a href="{{ url_for('citas_index') }}" class="btn btn-brand">Gestionar citas</a>
         <a href="{{ url_for('pacientes_index') }}" class="btn btn-outline-soft">Ver pacientes</a>
     </div>
+</section>
+
+<section class="summary-grid">
+    <article class="summary-card">
+        <span>Módulos activos</span>
+        <strong>4</strong>
+    </article>
 </section>
 
 <section class="home-grid">
