@@ -17,7 +17,7 @@ def get_db_connection():
         password=DB_PASSWORD,
         database=DB_NAME,
         port=DB_PORT,
-        auth_plugin='GhHcNmQnHwjzetZmqNCjJPHTBjjnJdIt'
+        auth_plugin='mysql_native_password'
     )
 
 @app.route("/")
