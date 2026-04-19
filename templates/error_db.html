@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Error de Base de Datos | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="confirm-card danger-card">
+        <span class="warning-badge">Configuración requerida</span>
+        <h1>No se pudo abrir la base de datos</h1>
+        <p>{{ error_message }}</p>
+
+        <div class="info-banner mt-4">
+            Crea o edita tu archivo <strong>.env</strong> en la raíz del proyecto con estos datos:
+            <br><br>
+            <strong>MYSQLHOST</strong>, <strong>MYSQLUSER</strong>, <strong>MYSQLPASSWORD</strong>, <strong>MYSQLDATABASE</strong>, <strong>MYSQLPORT</strong>
+        </div>
+
+        <div class="form-actions mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-soft">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,24 +1,93 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
 import mysql.connector
+from mysql.connector import Error
+
+
+def load_env_file():
+    env_path = ".env"
+    if not os.path.exists(env_path):
+        return
+
+    with open(env_path, "r", encoding="utf-8") as env_file:
+        for line in env_file:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            os.environ.setdefault(key, value)
+
+
+load_env_file()
 
 app = Flask(__name__)
 
 DB_HOST = os.environ.get('MYSQLHOST', 'localhost')
 DB_USER = os.environ.get('MYSQLUSER', 'root')
 DB_PASSWORD = os.environ.get('MYSQLPASSWORD', '')
-DB_NAME = os.environ.get('MYSQLDATABASE', 'railway') 
+DB_NAME = os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DATABASE') or os.environ.get('DB_NAME')
 DB_PORT = os.environ.get('MYSQLPORT', 3306)
 
+SYSTEM_DATABASES = {"information_schema", "mysql", "performance_schema", "sys"}
+DATABASE_CANDIDATES = ["hospital", "railway"]
+
+
+class DatabaseConfigError(RuntimeError):
+    pass
+
+
+def discover_database_name():
+    try:
+        temp_conn = mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            port=DB_PORT,
+            auth_plugin='mysql_native_password'
+        )
+        cursor = temp_conn.cursor()
+        cursor.execute("SHOW DATABASES")
+        databases = [row[0] for row in cursor.fetchall() if row[0] not in SYSTEM_DATABASES]
+        cursor.close()
+        temp_conn.close()
+
+        for candidate in DATABASE_CANDIDATES:
+            if candidate in databases:
+                return candidate
+
+        if len(databases) == 1:
+            return databases[0]
+    except Error:
+        return None
+
+    return None
+
 def get_db_connection():
-    return mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        port=DB_PORT,
-        auth_plugin='mysql_native_password'
-    )
+    database_name = DB_NAME or discover_database_name()
+
+    if not database_name:
+        raise DatabaseConfigError(
+            "No se pudo determinar la base de datos. "
+            "Configura MYSQLDATABASE en tu entorno o en tu archivo .env."
+        )
+
+    try:
+        return mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=database_name,
+            port=DB_PORT,
+            auth_plugin='mysql_native_password'
+        )
+    except Error as exc:
+        raise DatabaseConfigError(
+            f"No se pudo conectar a la base de datos '{database_name}'. "
+            f"Detalle: {exc}"
+        ) from exc
 
 
 def ensure_citas_table(conn):
@@ -77,6 +146,11 @@ def get_citas_resumen(lista_citas):
 @app.route("/")
 def index():
     return render_template('index.html')
+
+
+@app.errorhandler(DatabaseConfigError)
+def handle_database_config_error(error):
+    return render_template("error_db.html", error_message=str(error)), 500
 
 # ==========================================
 # CRUD 1: ESPECIALIDAD
