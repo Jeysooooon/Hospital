@@ -1,19 +1,56 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProHospital - Inicio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <div class="container mt-5 text-center">
-        <h1 class="mb-4">Sistema de Gestión - ProHospital</h1>
-        <div class="d-grid gap-3 col-6 mx-auto">
-            <a href="/especialidad/" class="btn btn-primary btn-lg">Gestión de Especialidades</a>
-            <a href="/doctores/" class="btn btn-success btn-lg">Gestión de Doctores</a>
-            <a href="/pacientes/" class="btn btn-info btn-lg text-white">Gestión de Pacientes</a>
+{% extends "base.html" %}
+
+{% block title %}Inicio | ProHospital{% endblock %}
+
+{% block content %}
+<section class="hero-panel">
+    <span class="eyebrow">Panel principal</span>
+    <h1 class="hero-title">Administra tu hospital con una interfaz más clara y profesional.</h1>
+    <p class="hero-text">
+        El diseño usa como base el azul claro <strong>#90D5FF</strong>, un gris azulado <strong>#77B1D4</strong> y contraste en blanco y negro
+        para que la lectura sea limpia, moderna y agradable en todas las pantallas.
+    </p>
+    <div class="hero-actions mt-4">
+        <a href="{{ url_for('especialidad_index') }}" class="btn btn-brand">Entrar a Especialidades</a>
+        <a href="{{ url_for('doctores_index') }}" class="btn btn-outline-soft">Ver Doctores</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span>Módulos activos</span>
+            <strong>3</strong>
+        </div>
+        <div class="stat-box">
+            <span>Color principal</span>
+            <strong>#90D5FF</strong>
+        </div>
+        <div class="stat-box">
+            <span>Estilo visual</span>
+            <strong>Limpio</strong>
         </div>
     </div>
-</body>
-</html>
+</section>
+
+<section class="home-grid">
+    <article class="home-card">
+        <span class="home-card-tag">Especialidades</span>
+        <h2>Organiza las áreas médicas</h2>
+        <p>Consulta, crea, edita y elimina especialidades desde una tabla más ordenada y visual.</p>
+        <a href="{{ url_for('especialidad_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+    </article>
+
+    <article class="home-card">
+        <span class="home-card-tag">Doctores</span>
+        <h2>Control del personal médico</h2>
+        <p>Mantén los datos del equipo médico accesibles con formularios más claros y consistentes.</p>
+        <a href="{{ url_for('doctores_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+    </article>
+
+    <article class="home-card">
+        <span class="home-card-tag">Pacientes</span>
+        <h2>Seguimiento de registros</h2>
+        <p>Gestiona la información de pacientes en una interfaz con mejor jerarquía visual y mejor lectura.</p>
+        <a href="{{ url_for('pacientes_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+    </article>
+</section>
+{% endblock %}

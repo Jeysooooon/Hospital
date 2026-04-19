@@ -1,25 +1,33 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar Especialidad</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container mt-4">
-    <h3>Agregar Especialidad</h3>
-    <form action="/especialidad/agregar" method="POST" class="card p-4 shadow-sm w-50">
-        <div class="mb-3">
-            <label>Nombre de la Especialidad:</label>
-            <input type="text" name="EspNombre" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Descripción:</label>
-            <textarea name="EspDescripcion" class="form-control" rows="3" required></textarea>
-        </div>
+{% extends "base.html" %}
+
+{% block title %}Agregar Especialidad | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
         <div>
-            <input type="submit" value="Guardar" class="btn btn-success">
-            <a href="/especialidad/" class="btn btn-secondary">Cancelar</a>
+            <span class="eyebrow">Nueva entrada</span>
+            <h1>Agregar especialidad</h1>
+            <p>Completa los datos principales para registrar una nueva especialidad médica.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('especialidad_agregar') }}" method="POST" class="form-card">
+        <div class="mb-4">
+            <label for="EspNombre" class="form-label">Nombre de la especialidad</label>
+            <input type="text" id="EspNombre" name="EspNombre" class="form-control" placeholder="Ejemplo: Cardiología" required>
+            <div class="helper-text">Usa un nombre corto, claro y fácil de identificar.</div>
+        </div>
+
+        <div class="mb-4">
+            <label for="EspDescripcion" class="form-label">Descripción</label>
+            <textarea id="EspDescripcion" name="EspDescripcion" class="form-control" rows="4" placeholder="Describe el enfoque o servicios de esta especialidad." required></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-save">Guardar especialidad</button>
+            <a href="{{ url_for('especialidad_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>
-</body>
-</html>
+</section>
+{% endblock %}

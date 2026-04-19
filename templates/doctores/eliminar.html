@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}Eliminar Paciente | ProHospital{% endblock %}
+{% block title %}Eliminar Doctor | ProHospital{% endblock %}
 
 {% block content %}
 <section class="page-card narrow-page">
     <div class="confirm-card danger-card">
         <span class="warning-badge">Acción delicada</span>
-        <h1>Eliminar paciente</h1>
-        <p>Antes de confirmar, revisa los datos del paciente. Esta acción elimina el registro del listado actual.</p>
+        <h1>Eliminar doctor</h1>
+        <p>Vas a eliminar el registro de este profesional. Revisa los datos antes de confirmar la acción.</p>
 
         <div class="confirm-grid">
             <div class="confirm-item">
                 <span>Código</span>
-                <strong>{{ paciente.0 }}</strong>
+                <strong>{{ doctor.0 }}</strong>
             </div>
             <div class="confirm-item">
                 <span>Nombre completo</span>
-                <strong>{{ paciente.1 }} {{ paciente.2 }}</strong>
+                <strong>{{ doctor.1 }} {{ doctor.2 }}</strong>
             </div>
             <div class="confirm-item">
-                <span>DNI</span>
-                <strong>{{ paciente.3 }}</strong>
+                <span>Especialidad</span>
+                <strong>{{ doctor.3 }}</strong>
             </div>
         </div>
 
         <form action="" method="POST" class="form-actions mt-4">
             <button type="submit" class="btn btn-delete">Sí, eliminar</button>
-            <a href="{{ url_for('pacientes_index') }}" class="btn btn-outline-soft">Cancelar</a>
+            <a href="{{ url_for('doctores_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </form>
     </div>
 </section>

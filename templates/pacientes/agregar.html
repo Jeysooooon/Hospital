@@ -1,22 +1,45 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar Paciente</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container mt-4">
-    <h3>Agregar Paciente</h3>
-    <form action="/pacientes/agregar" method="POST" class="card p-4 shadow-sm w-50">
-        <div class="mb-2"><label>Nombre:</label><input type="text" name="PacNombre" class="form-control" required></div>
-        <div class="mb-2"><label>Apellido:</label><input type="text" name="PacApellido" class="form-control" required></div>
-        <div class="mb-2"><label>Identidad (DNI):</label><input type="text" name="PacDNI" class="form-control" required></div>
-        <div class="mb-2"><label>Teléfono:</label><input type="text" name="PacTelefono" class="form-control"></div>
-        <div class="mb-3"><label>Dirección:</label><textarea name="PacDireccion" class="form-control" rows="2"></textarea></div>
+{% extends "base.html" %}
+
+{% block title %}Agregar Paciente | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
         <div>
-            <input type="submit" value="Guardar" class="btn btn-success">
-            <a href="/pacientes/" class="btn btn-secondary">Cancelar</a>
+            <span class="eyebrow">Nuevo paciente</span>
+            <h1>Agregar paciente</h1>
+            <p>Registra datos de identificación y contacto con una interfaz más clara y mejor distribuida.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('pacientes_agregar') }}" method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="PacNombre" class="form-label">Nombre</label>
+                <input type="text" id="PacNombre" name="PacNombre" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="PacApellido" class="form-label">Apellido</label>
+                <input type="text" id="PacApellido" name="PacApellido" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="PacDNI" class="form-label">Identidad (DNI)</label>
+                <input type="text" id="PacDNI" name="PacDNI" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="PacTelefono" class="form-label">Teléfono</label>
+                <input type="text" id="PacTelefono" name="PacTelefono" class="form-control">
+            </div>
+            <div class="col-12">
+                <label for="PacDireccion" class="form-label">Dirección</label>
+                <textarea id="PacDireccion" name="PacDireccion" class="form-control" rows="4" placeholder="Colonia, calle, referencia o dirección completa."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-save">Guardar paciente</button>
+            <a href="{{ url_for('pacientes_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>
-</body>
-</html>
+</section>
+{% endblock %}

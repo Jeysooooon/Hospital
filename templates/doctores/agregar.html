@@ -1,22 +1,45 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar Doctor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container mt-4">
-    <h3>Agregar Doctor</h3>
-    <form action="/doctores/agregar" method="POST" class="card p-4 shadow-sm w-50">
-        <div class="mb-2"><label>Nombre:</label><input type="text" name="DocNombre" class="form-control" required></div>
-        <div class="mb-2"><label>Apellido:</label><input type="text" name="DocApellido" class="form-control" required></div>
-        <div class="mb-2"><label>Especialidad:</label><input type="text" name="DocEspecialidad" class="form-control" required></div>
-        <div class="mb-2"><label>Teléfono:</label><input type="text" name="DocTelefono" class="form-control"></div>
-        <div class="mb-3"><label>Correo:</label><input type="email" name="DocCorreo" class="form-control"></div>
+{% extends "base.html" %}
+
+{% block title %}Agregar Doctor | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
         <div>
-            <input type="submit" value="Guardar" class="btn btn-success">
-            <a href="/doctores/" class="btn btn-secondary">Cancelar</a>
+            <span class="eyebrow">Nuevo registro</span>
+            <h1>Agregar doctor</h1>
+            <p>Ingresa la información principal del profesional para mantener actualizado el equipo médico.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('doctores_agregar') }}" method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="DocNombre" class="form-label">Nombre</label>
+                <input type="text" id="DocNombre" name="DocNombre" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="DocApellido" class="form-label">Apellido</label>
+                <input type="text" id="DocApellido" name="DocApellido" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="DocEspecialidad" class="form-label">Especialidad</label>
+                <input type="text" id="DocEspecialidad" name="DocEspecialidad" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="DocTelefono" class="form-label">Teléfono</label>
+                <input type="text" id="DocTelefono" name="DocTelefono" class="form-control">
+            </div>
+            <div class="col-12">
+                <label for="DocCorreo" class="form-label">Correo electrónico</label>
+                <input type="email" id="DocCorreo" name="DocCorreo" class="form-control" placeholder="doctor@hospital.com">
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-save">Guardar doctor</button>
+            <a href="{{ url_for('doctores_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>
-</body>
-</html>
+</section>
+{% endblock %}

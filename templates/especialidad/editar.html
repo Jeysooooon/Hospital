@@ -1,25 +1,32 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Especialidad</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container mt-4">
-    <h3>Editar Especialidad</h3>
-    <form action="" method="POST" class="card p-4 shadow-sm w-50">
-        <div class="mb-3">
-            <label>Nombre:</label>
-            <input type="text" name="EspNombre" class="form-control" value="{{ especialidad.1 }}" required>
-        </div>
-        <div class="mb-3">
-            <label>Descripción:</label>
-            <textarea name="EspDescripcion" class="form-control" rows="3" required>{{ especialidad.2 }}</textarea>
-        </div>
+{% extends "base.html" %}
+
+{% block title %}Editar Especialidad | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
         <div>
-            <input type="submit" value="Actualizar" class="btn btn-warning">
-            <a href="/especialidad/" class="btn btn-secondary">Cancelar</a>
+            <span class="eyebrow">Actualización</span>
+            <h1>Editar especialidad</h1>
+            <p>Modifica la información para mantener actualizado el catálogo de áreas médicas.</p>
+        </div>
+    </div>
+
+    <form action="" method="POST" class="form-card">
+        <div class="mb-4">
+            <label for="EspNombre" class="form-label">Nombre</label>
+            <input type="text" id="EspNombre" name="EspNombre" class="form-control" value="{{ especialidad.1 }}" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="EspDescripcion" class="form-label">Descripción</label>
+            <textarea id="EspDescripcion" name="EspDescripcion" class="form-control" rows="4" required>{{ especialidad.2 }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-brand">Actualizar información</button>
+            <a href="{{ url_for('especialidad_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>
-</body>
-</html>
+</section>
+{% endblock %}
