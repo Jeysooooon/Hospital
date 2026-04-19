@@ -321,37 +321,43 @@ def pacientes_eliminar(codigo):
 # ==========================================
 @app.route("/citas/")
 def citas_index():
-    conn = get_db_connection()
-    ensure_citas_table(conn)
-    cursor = conn.cursor()
-    cursor.execute(
+    try:
+        conn = get_db_connection()
+        ensure_citas_table(conn)
+        cursor = conn.cursor(dictionary=True) # Usamos dictionary=True para facilitar el acceso en el HTML
+        
+        query = """
+            SELECT 
+                c.CitCodigo, 
+                c.CitFecha, 
+                c.CitHora, 
+                c.CitEstado, 
+                c.CitMotivo, 
+                c.CitObservaciones,
+                p.PacCodigo, 
+                CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
+                d.DocCodigo, 
+                CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre
+            FROM citas c
+            INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
+            INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+            ORDER BY c.CitFecha ASC, c.CitHora ASC
         """
-        SELECT
-            c.CitCodigo,
-            c.CitFecha,
-            c.CitHora,
-            c.CitEstado,
-            c.CitMotivo,
-            c.CitObservaciones,
-            p.PacCodigo,
-            CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
-            d.DocCodigo,
-            CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad
-        FROM citas c
-        INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
-        INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
-        ORDER BY c.CitFecha ASC, c.CitHora ASC
-        """
-    )
-    datos = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template(
-        'citas/index.html',
-        lista_citas=datos,
-        resumen=get_citas_resumen(datos),
-    )
+        
+        cursor.execute(query)
+        datos = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return render_template(
+            'citas/index.html', 
+            lista_citas=datos, 
+            resumen=get_citas_resumen(datos)
+        )
+    except Exception as e:
+        # Esto te ayudará a ver el error real en los logs de Railway si algo falla
+        print(f"Error en citas_index: {e}")
+        return f"Error al cargar citas: {e}", 500
 
 
 @app.route("/citas/agregar", methods=["GET", "POST"])
