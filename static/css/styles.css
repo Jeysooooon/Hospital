@@ -171,7 +171,8 @@ a {
 }
 
 .stats-grid,
-.home-grid {
+.home-grid,
+.summary-grid {
     display: grid;
     gap: 1.25rem;
 }
@@ -225,6 +226,31 @@ a {
     color: var(--color-text);
     font-size: 0.82rem;
     font-weight: 600;
+}
+
+.summary-grid {
+    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.summary-card {
+    padding: 1.25rem 1.35rem;
+    border: 1px solid rgba(119, 177, 212, 0.22);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.summary-card span {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--color-text-soft);
+    font-size: 0.92rem;
+}
+
+.summary-card strong {
+    color: var(--color-text);
+    font-size: 2rem;
+    font-weight: 700;
 }
 
 .section-heading {
@@ -428,6 +454,56 @@ a {
     display: flex;
     gap: 0.7rem;
     flex-wrap: wrap;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 116px;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.status-programada {
+    color: #114f74;
+    background: rgba(144, 213, 255, 0.38);
+}
+
+.status-confirmada {
+    color: #175940;
+    background: rgba(47, 124, 103, 0.16);
+}
+
+.status-completada {
+    color: #4c3d16;
+    background: rgba(212, 188, 119, 0.28);
+}
+
+.status-cancelada {
+    color: #8e2f2f;
+    background: rgba(217, 93, 93, 0.16);
+}
+
+.stacked-text strong,
+.stacked-text span {
+    display: block;
+}
+
+.stacked-text span {
+    color: var(--color-text-soft);
+    font-size: 0.84rem;
+    margin-top: 0.2rem;
+}
+
+.info-banner {
+    padding: 1.1rem 1.2rem;
+    border-radius: 18px;
+    border: 1px solid rgba(119, 177, 212, 0.2);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--color-text-soft);
 }
 
 .narrow-page {

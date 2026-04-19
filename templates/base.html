@@ -38,6 +38,9 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.path.startswith('/pacientes') %}active{% endif %}" href="{{ url_for('pacientes_index') }}">Pacientes</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path.startswith('/citas') %}active{% endif %}" href="{{ url_for('citas_index') }}">Citas</a>
+                        </li>
                     </ul>
                 </div>
             </div>

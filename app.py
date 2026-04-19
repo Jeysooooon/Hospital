@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 import mysql.connector
 
 app = Flask(__name__)
@@ -19,6 +19,60 @@ def get_db_connection():
         port=DB_PORT,
         auth_plugin='mysql_native_password'
     )
+
+
+def ensure_citas_table(conn):
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS citas (
+            CitCodigo INT AUTO_INCREMENT PRIMARY KEY,
+            PacCodigo INT NOT NULL,
+            DocCodigo INT NOT NULL,
+            CitFecha DATE NOT NULL,
+            CitHora TIME NOT NULL,
+            CitEstado VARCHAR(30) NOT NULL DEFAULT 'Programada',
+            CitMotivo VARCHAR(150) NOT NULL,
+            CitObservaciones TEXT NULL
+        )
+        """
+    )
+    conn.commit()
+    cursor.close()
+
+
+def get_pacientes_doctores(conn):
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT PacCodigo, PacNombre, PacApellido
+        FROM pacientes
+        ORDER BY PacNombre, PacApellido
+        """
+    )
+    pacientes = cursor.fetchall()
+
+    cursor.execute(
+        """
+        SELECT DocCodigo, DocNombre, DocApellido, DocEspecialidad
+        FROM doctores
+        ORDER BY DocNombre, DocApellido
+        """
+    )
+    doctores = cursor.fetchall()
+    cursor.close()
+    return pacientes, doctores
+
+
+def get_citas_resumen(lista_citas):
+    total = len(lista_citas)
+    programadas = sum(1 for cita in lista_citas if cita[3] == "Programada")
+    confirmadas = sum(1 for cita in lista_citas if cita[3] == "Confirmada")
+    return {
+        "total": total,
+        "programadas": programadas,
+        "confirmadas": confirmadas,
+    }
 
 @app.route("/")
 def index():
@@ -240,6 +294,188 @@ def pacientes_eliminar(codigo):
         cursor.close()
         conn.close()
         return redirect(url_for('pacientes_index'))
+
+
+# ==========================================
+# CRUD 4: CITAS
+# ==========================================
+@app.route("/citas/")
+def citas_index():
+    conn = get_db_connection()
+    ensure_citas_table(conn)
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT
+            c.CitCodigo,
+            c.CitFecha,
+            c.CitHora,
+            c.CitEstado,
+            c.CitMotivo,
+            c.CitObservaciones,
+            p.PacCodigo,
+            CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
+            d.DocCodigo,
+            CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
+            d.DocEspecialidad
+        FROM citas c
+        INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
+        INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        ORDER BY c.CitFecha ASC, c.CitHora ASC
+        """
+    )
+    datos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template(
+        'citas/index.html',
+        lista_citas=datos,
+        resumen=get_citas_resumen(datos),
+    )
+
+
+@app.route("/citas/agregar", methods=["GET", "POST"])
+def citas_agregar():
+    conn = get_db_connection()
+    ensure_citas_table(conn)
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        paciente = request.form['PacCodigo']
+        doctor = request.form['DocCodigo']
+        fecha = request.form['CitFecha']
+        hora = request.form['CitHora']
+        estado = request.form['CitEstado']
+        motivo = request.form['CitMotivo']
+        observaciones = request.form['CitObservaciones']
+        cursor.execute(
+            """
+            INSERT INTO citas (
+                PacCodigo,
+                DocCodigo,
+                CitFecha,
+                CitHora,
+                CitEstado,
+                CitMotivo,
+                CitObservaciones
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (paciente, doctor, fecha, hora, estado, motivo, observaciones),
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('citas_index'))
+
+    pacientes, doctores = get_pacientes_doctores(conn)
+    conn.close()
+    return render_template(
+        'citas/agregar.html',
+        pacientes=pacientes,
+        doctores=doctores,
+        estados_cita=["Programada", "Confirmada", "Completada", "Cancelada"],
+    )
+
+
+@app.route("/citas/editar/<string:codigo>", methods=["GET", "POST"])
+def citas_editar(codigo):
+    conn = get_db_connection()
+    ensure_citas_table(conn)
+
+    if request.method == 'GET':
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT
+                CitCodigo,
+                PacCodigo,
+                DocCodigo,
+                DATE_FORMAT(CitFecha, '%%Y-%%m-%%d'),
+                TIME_FORMAT(CitHora, '%%H:%%i'),
+                CitEstado,
+                CitMotivo,
+                IFNULL(CitObservaciones, '')
+            FROM citas
+            WHERE CitCodigo = %s
+            """,
+            (codigo,),
+        )
+        cita = cursor.fetchone()
+        cursor.close()
+        pacientes, doctores = get_pacientes_doctores(conn)
+        conn.close()
+        return render_template(
+            'citas/editar.html',
+            cita=cita,
+            pacientes=pacientes,
+            doctores=doctores,
+            estados_cita=["Programada", "Confirmada", "Completada", "Cancelada"],
+        )
+
+    cursor = conn.cursor()
+    paciente = request.form['PacCodigo']
+    doctor = request.form['DocCodigo']
+    fecha = request.form['CitFecha']
+    hora = request.form['CitHora']
+    estado = request.form['CitEstado']
+    motivo = request.form['CitMotivo']
+    observaciones = request.form['CitObservaciones']
+    cursor.execute(
+        """
+        UPDATE citas
+        SET
+            PacCodigo = %s,
+            DocCodigo = %s,
+            CitFecha = %s,
+            CitHora = %s,
+            CitEstado = %s,
+            CitMotivo = %s,
+            CitObservaciones = %s
+        WHERE CitCodigo = %s
+        """,
+        (paciente, doctor, fecha, hora, estado, motivo, observaciones, codigo),
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('citas_index'))
+
+
+@app.route("/citas/eliminar/<string:codigo>", methods=["GET", "POST"])
+def citas_eliminar(codigo):
+    conn = get_db_connection()
+    ensure_citas_table(conn)
+
+    if request.method == 'GET':
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT
+                c.CitCodigo,
+                c.CitFecha,
+                c.CitHora,
+                c.CitEstado,
+                c.CitMotivo,
+                CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
+                CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre
+            FROM citas c
+            INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
+            INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+            WHERE c.CitCodigo = %s
+            """,
+            (codigo,),
+        )
+        cita = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return render_template('citas/eliminar.html', cita=cita)
+
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM citas WHERE CitCodigo = %s", (codigo,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('citas_index'))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

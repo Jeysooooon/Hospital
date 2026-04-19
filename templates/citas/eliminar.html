@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Cita | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="confirm-card danger-card">
+        <span class="warning-badge">Acción delicada</span>
+        <h1>Eliminar cita</h1>
+        <p>Confirma que deseas eliminar esta cita. Esta acción quitará el registro de la agenda actual.</p>
+
+        <div class="confirm-grid">
+            <div class="confirm-item">
+                <span>Paciente</span>
+                <strong>{{ cita.5 }}</strong>
+            </div>
+            <div class="confirm-item">
+                <span>Doctor</span>
+                <strong>{{ cita.6 }}</strong>
+            </div>
+            <div class="confirm-item">
+                <span>Fecha y hora</span>
+                <strong>{{ cita.1 }} - {{ cita.2 }}</strong>
+            </div>
+            <div class="confirm-item">
+                <span>Estado</span>
+                <strong>{{ cita.3 }}</strong>
+            </div>
+        </div>
+
+        <div class="info-banner mt-4">
+            Motivo registrado: <strong>{{ cita.4 }}</strong>
+        </div>
+
+        <form action="" method="POST" class="form-actions mt-4">
+            <button type="submit" class="btn btn-delete">Sí, eliminar</button>
+            <a href="{{ url_for('citas_index') }}" class="btn btn-outline-soft">Cancelar</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

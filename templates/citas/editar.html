@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Cita | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Actualización</span>
+            <h1>Editar cita</h1>
+            <p>Actualiza el horario, el estado o el motivo de la cita para mantener la agenda clínica al día.</p>
+        </div>
+    </div>
+
+    <form action="" method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="PacCodigo" class="form-label">Paciente</label>
+                <select id="PacCodigo" name="PacCodigo" class="form-control" required>
+                    {% for paciente in pacientes %}
+                    <option value="{{ paciente.0 }}" {% if paciente.0 == cita.1 %}selected{% endif %}>
+                        {{ paciente.1 }} {{ paciente.2 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="DocCodigo" class="form-label">Doctor</label>
+                <select id="DocCodigo" name="DocCodigo" class="form-control" required>
+                    {% for doctor in doctores %}
+                    <option value="{{ doctor.0 }}" {% if doctor.0 == cita.2 %}selected{% endif %}>
+                        {{ doctor.1 }} {{ doctor.2 }} - {{ doctor.3 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CitFecha" class="form-label">Fecha</label>
+                <input type="date" id="CitFecha" name="CitFecha" class="form-control" value="{{ cita.3 }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="CitHora" class="form-label">Hora</label>
+                <input type="time" id="CitHora" name="CitHora" class="form-control" value="{{ cita.4 }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="CitEstado" class="form-label">Estado</label>
+                <select id="CitEstado" name="CitEstado" class="form-control" required>
+                    {% for estado in estados_cita %}
+                    <option value="{{ estado }}" {% if estado == cita.5 %}selected{% endif %}>{{ estado }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CitMotivo" class="form-label">Motivo</label>
+                <input type="text" id="CitMotivo" name="CitMotivo" class="form-control" value="{{ cita.6 }}" required>
+            </div>
+            <div class="col-12">
+                <label for="CitObservaciones" class="form-label">Observaciones</label>
+                <textarea id="CitObservaciones" name="CitObservaciones" class="form-control" rows="4">{{ cita.7 }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-brand">Actualizar cita</button>
+            <a href="{{ url_for('citas_index') }}" class="btn btn-outline-soft">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

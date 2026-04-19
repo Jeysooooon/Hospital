@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Cita | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Nueva cita</span>
+            <h1>Programar cita</h1>
+            <p>Selecciona paciente, doctor, fecha, hora y estado para dejar la agenda bien organizada desde el principio.</p>
+        </div>
+    </div>
+
+    {% if not pacientes or not doctores %}
+    <div class="info-banner">
+        Necesitas al menos un paciente y un doctor registrados antes de crear una cita.
+        <div class="form-actions mt-3">
+            <a href="{{ url_for('pacientes_agregar') }}" class="btn btn-brand">Agregar paciente</a>
+            <a href="{{ url_for('doctores_agregar') }}" class="btn btn-outline-soft">Agregar doctor</a>
+        </div>
+    </div>
+    {% else %}
+    <form action="{{ url_for('citas_agregar') }}" method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="PacCodigo" class="form-label">Paciente</label>
+                <select id="PacCodigo" name="PacCodigo" class="form-control" required>
+                    <option value="">Selecciona un paciente</option>
+                    {% for paciente in pacientes %}
+                    <option value="{{ paciente.0 }}">{{ paciente.1 }} {{ paciente.2 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="DocCodigo" class="form-label">Doctor</label>
+                <select id="DocCodigo" name="DocCodigo" class="form-control" required>
+                    <option value="">Selecciona un doctor</option>
+                    {% for doctor in doctores %}
+                    <option value="{{ doctor.0 }}">{{ doctor.1 }} {{ doctor.2 }} - {{ doctor.3 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CitFecha" class="form-label">Fecha</label>
+                <input type="date" id="CitFecha" name="CitFecha" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="CitHora" class="form-label">Hora</label>
+                <input type="time" id="CitHora" name="CitHora" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="CitEstado" class="form-label">Estado</label>
+                <select id="CitEstado" name="CitEstado" class="form-control" required>
+                    {% for estado in estados_cita %}
+                    <option value="{{ estado }}" {% if estado == 'Programada' %}selected{% endif %}>{{ estado }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CitMotivo" class="form-label">Motivo</label>
+                <input type="text" id="CitMotivo" name="CitMotivo" class="form-control" placeholder="Consulta general, control, revisión..." required>
+            </div>
+            <div class="col-12">
+                <label for="CitObservaciones" class="form-label">Observaciones</label>
+                <textarea id="CitObservaciones" name="CitObservaciones" class="form-control" rows="4" placeholder="Notas internas, preparación previa o comentarios importantes."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-save">Guardar cita</button>
+            <a href="{{ url_for('citas_index') }}" class="btn btn-outline-soft">Cancelar</a>
+        </div>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

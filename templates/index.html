@@ -5,29 +5,13 @@
 {% block content %}
 <section class="hero-panel">
     <span class="eyebrow">Panel principal</span>
-    <h1 class="hero-title">Administra tu hospital con una interfaz más clara y profesional.</h1>
+    <h1 class="hero-title">Administra tu hospital desde un panel claro, ordenado y fácil de usar.</h1>
     <p class="hero-text">
-        El diseño usa como base el azul claro <strong>#90D5FF</strong>, un gris azulado <strong>#77B1D4</strong> y contraste en blanco y negro
-        para que la lectura sea limpia, moderna y agradable en todas las pantallas.
+        Centraliza especialidades, doctores, pacientes y citas en un solo lugar para trabajar más rápido y con menos distracciones.
     </p>
     <div class="hero-actions mt-4">
-        <a href="{{ url_for('especialidad_index') }}" class="btn btn-brand">Entrar a Especialidades</a>
-        <a href="{{ url_for('doctores_index') }}" class="btn btn-outline-soft">Ver Doctores</a>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-box">
-            <span>Módulos activos</span>
-            <strong>3</strong>
-        </div>
-        <div class="stat-box">
-            <span>Color principal</span>
-            <strong>#90D5FF</strong>
-        </div>
-        <div class="stat-box">
-            <span>Estilo visual</span>
-            <strong>Limpio</strong>
-        </div>
+        <a href="{{ url_for('citas_index') }}" class="btn btn-brand">Gestionar citas</a>
+        <a href="{{ url_for('pacientes_index') }}" class="btn btn-outline-soft">Ver pacientes</a>
     </div>
 </section>
 
@@ -51,6 +35,13 @@
         <h2>Seguimiento de registros</h2>
         <p>Gestiona la información de pacientes en una interfaz con mejor jerarquía visual y mejor lectura.</p>
         <a href="{{ url_for('pacientes_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+    </article>
+
+    <article class="home-card">
+        <span class="home-card-tag">Citas</span>
+        <h2>Agenda médica organizada</h2>
+        <p>Programa consultas con fecha, hora, estado y observaciones para darle seguimiento al día clínico.</p>
+        <a href="{{ url_for('citas_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
     </article>
 </section>
 {% endblock %}
