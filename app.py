@@ -63,12 +63,13 @@ schema_ready = False
 
 
 class SystemUser(UserMixin):
-    def __init__(self, user_id, username, nombre, rol, pac_codigo=None):
+    def __init__(self, user_id, username, nombre, rol, pac_codigo=None, doc_codigo=None):
         self.id = str(user_id)
         self.username = username
         self.nombre = nombre
         self.rol = rol
         self.pac_codigo = pac_codigo
+        self.doc_codigo = doc_codigo
 
 
 def get_db_connection():
@@ -84,6 +85,21 @@ def get_db_connection():
 
 def column_exists(cursor, table_name, column_name):
     cursor.execute(f"SHOW COLUMNS FROM {table_name} LIKE %s", (column_name,))
+    return cursor.fetchone() is not None
+
+
+def constraint_exists(cursor, table_name, constraint_name):
+    cursor.execute(
+        """
+        SELECT 1
+        FROM information_schema.TABLE_CONSTRAINTS
+        WHERE TABLE_SCHEMA = %s
+            AND TABLE_NAME = %s
+            AND CONSTRAINT_NAME = %s
+        LIMIT 1
+        """,
+        (DB_NAME, table_name, constraint_name),
+    )
     return cursor.fetchone() is not None
 
 
@@ -130,19 +146,50 @@ def ensure_usuarios_table(conn):
         CREATE TABLE IF NOT EXISTS usuarios (
             UsuCodigo INT AUTO_INCREMENT PRIMARY KEY,
             PacCodigo INT NULL,
+            DocCodigo INT NULL,
             UsuNombre VARCHAR(120) NOT NULL,
             UsuUsername VARCHAR(80) NOT NULL UNIQUE,
             UsuCorreo VARCHAR(120) NULL,
             UsuPasswordHash VARCHAR(255) NOT NULL,
-            UsuRol ENUM('admin', 'paciente') NOT NULL DEFAULT 'paciente',
+            UsuRol ENUM('admin', 'paciente', 'doctor') NOT NULL DEFAULT 'paciente',
             UsuActivo TINYINT(1) NOT NULL DEFAULT 1,
             FechaCreacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT fk_usuarios_pacientes
                 FOREIGN KEY (PacCodigo) REFERENCES pacientes(PacCodigo)
+                ON DELETE SET NULL,
+            CONSTRAINT fk_usuarios_doctores
+                FOREIGN KEY (DocCodigo) REFERENCES doctores(DocCodigo)
                 ON DELETE SET NULL
         )
         """
     )
+    conn.commit()
+    cursor.close()
+
+
+def ensure_usuarios_role_support(conn):
+    cursor = conn.cursor()
+
+    if not column_exists(cursor, "usuarios", "DocCodigo"):
+        cursor.execute("ALTER TABLE usuarios ADD COLUMN DocCodigo INT NULL AFTER PacCodigo")
+
+    cursor.execute(
+        """
+        ALTER TABLE usuarios
+        MODIFY COLUMN UsuRol ENUM('admin', 'paciente', 'doctor') NOT NULL DEFAULT 'paciente'
+        """
+    )
+
+    if not constraint_exists(cursor, "usuarios", "fk_usuarios_doctores"):
+        cursor.execute(
+            """
+            ALTER TABLE usuarios
+            ADD CONSTRAINT fk_usuarios_doctores
+            FOREIGN KEY (DocCodigo) REFERENCES doctores(DocCodigo)
+            ON DELETE SET NULL
+            """
+        )
+
     conn.commit()
     cursor.close()
 
@@ -243,6 +290,7 @@ def prepare_database():
         ensure_citas_table(conn)
         ensure_profile_columns(conn)
         ensure_usuarios_table(conn)
+        ensure_usuarios_role_support(conn)
         ensure_historial_table(conn)
         ensure_horarios_table(conn)
         ensure_default_admin(conn)
@@ -264,8 +312,11 @@ def build_user(row):
 
     display_name = row["UsuNombre"] or row["UsuUsername"]
     patient_name = (row.get("PacienteNombre") or "").strip()
-    if patient_name:
+    doctor_name = (row.get("DoctorNombre") or "").strip()
+    if row["UsuRol"] == "paciente" and patient_name:
         display_name = patient_name
+    elif row["UsuRol"] == "doctor" and doctor_name:
+        display_name = doctor_name
 
     return SystemUser(
         user_id=row["UsuCodigo"],
@@ -273,6 +324,7 @@ def build_user(row):
         nombre=display_name,
         rol=row["UsuRol"],
         pac_codigo=row["PacCodigo"],
+        doc_codigo=row.get("DocCodigo"),
     )
 
 
@@ -285,12 +337,15 @@ def load_user(user_id):
         SELECT
             u.UsuCodigo,
             u.PacCodigo,
+            u.DocCodigo,
             u.UsuNombre,
             u.UsuUsername,
             u.UsuRol,
-            CONCAT(IFNULL(p.PacNombre, ''), ' ', IFNULL(p.PacApellido, '')) AS PacienteNombre
+            CONCAT(IFNULL(p.PacNombre, ''), ' ', IFNULL(p.PacApellido, '')) AS PacienteNombre,
+            CONCAT(IFNULL(d.DocNombre, ''), ' ', IFNULL(d.DocApellido, '')) AS DoctorNombre
         FROM usuarios u
         LEFT JOIN pacientes p ON u.PacCodigo = p.PacCodigo
+        LEFT JOIN doctores d ON u.DocCodigo = d.DocCodigo
         WHERE u.UsuCodigo = %s AND u.UsuActivo = 1
         """,
         (user_id,),
@@ -301,12 +356,20 @@ def load_user(user_id):
     return build_user(row)
 
 
+def dashboard_endpoint_for_role(role):
+    if role == "admin":
+        return "admin_dashboard"
+    if role == "doctor":
+        return "doctor_panel"
+    return "mi_panel"
+
+
 def admin_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
         if current_user.rol != "admin":
             flash("Esta seccion es solo para administradores.", "danger")
-            return redirect(url_for("mi_panel"))
+            return redirect(url_for(dashboard_endpoint_for_role(current_user.rol)))
         return view_func(*args, **kwargs)
 
     return wrapped_view
@@ -317,10 +380,25 @@ def patient_required(view_func):
     def wrapped_view(*args, **kwargs):
         if current_user.rol != "paciente":
             flash("Esta seccion es solo para pacientes.", "danger")
-            return redirect(url_for("admin_dashboard"))
+            return redirect(url_for(dashboard_endpoint_for_role(current_user.rol)))
         if not current_user.pac_codigo:
             logout_user()
             flash("Tu usuario no esta vinculado a un paciente. Revisa la tabla usuarios.", "danger")
+            return redirect(url_for("login"))
+        return view_func(*args, **kwargs)
+
+    return wrapped_view
+
+
+def doctor_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if current_user.rol != "doctor":
+            flash("Esta seccion es solo para doctores.", "danger")
+            return redirect(url_for(dashboard_endpoint_for_role(current_user.rol)))
+        if not current_user.doc_codigo:
+            logout_user()
+            flash("Tu usuario no esta vinculado a un doctor. Revisa la tabla usuarios.", "danger")
             return redirect(url_for("login"))
         return view_func(*args, **kwargs)
 
@@ -518,6 +596,229 @@ def get_patient_history(conn, pac_codigo):
     return historial
 
 
+def get_doctor_profile(conn, doc_codigo):
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        SELECT
+            DocCodigo,
+            DocNombre,
+            DocApellido,
+            DocEspecialidad,
+            DocTelefono,
+            DocCorreo
+        FROM doctores
+        WHERE DocCodigo = %s
+        """,
+        (doc_codigo,),
+    )
+    doctor = cursor.fetchone()
+    cursor.close()
+    return doctor
+
+
+def get_doctor_appointments(conn, doc_codigo, limit=None):
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT
+            c.CitCodigo,
+            c.PacCodigo,
+            c.CitFecha,
+            c.CitHora,
+            c.CitEstado,
+            c.CitMotivo,
+            c.CitObservaciones,
+            CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
+            p.PacTelefono,
+            p.PacTipoSangre,
+            hc.HcCodigo,
+            hc.HcDiagnostico
+        FROM citas c
+        INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
+        LEFT JOIN historial_clinico hc ON c.CitCodigo = hc.CitCodigo
+        WHERE c.DocCodigo = %s
+        ORDER BY c.CitFecha ASC, c.CitHora ASC
+    """
+    params = [doc_codigo]
+    if limit:
+        query += " LIMIT %s"
+        params.append(limit)
+
+    cursor.execute(query, tuple(params))
+    citas = cursor.fetchall()
+    cursor.close()
+    return citas
+
+
+def get_doctor_schedule_entries(conn, doc_codigo):
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        SELECT
+            HorCodigo,
+            HorDiaSemana,
+            HorHoraInicio,
+            HorHoraFin,
+            HorActivo
+        FROM horarios_medicos
+        WHERE DocCodigo = %s
+        ORDER BY
+            CASE LOWER(HorDiaSemana)
+                WHEN 'lunes' THEN 1
+                WHEN 'martes' THEN 2
+                WHEN 'miercoles' THEN 3
+                WHEN 'jueves' THEN 4
+                WHEN 'viernes' THEN 5
+                WHEN 'sabado' THEN 6
+                WHEN 'domingo' THEN 7
+                ELSE 99
+            END,
+            HorHoraInicio
+        """,
+        (doc_codigo,),
+    )
+    horarios = cursor.fetchall()
+    cursor.close()
+    return horarios
+
+
+def get_doctor_patients(conn, doc_codigo, search_term=""):
+    cursor = conn.cursor(dictionary=True)
+    pattern = f"%{search_term}%"
+    cursor.execute(
+        """
+        SELECT
+            p.PacCodigo,
+            p.PacNombre,
+            p.PacApellido,
+            p.PacDNI,
+            p.PacTelefono,
+            p.PacTipoSangre,
+            p.PacAlergias,
+            p.PacPeso,
+            COUNT(DISTINCT c.CitCodigo) AS TotalCitas,
+            MAX(c.CitFecha) AS UltimaCita
+        FROM pacientes p
+        INNER JOIN citas c ON p.PacCodigo = c.PacCodigo
+        WHERE c.DocCodigo = %s
+            AND (
+                %s = ''
+                OR p.PacNombre LIKE %s
+                OR p.PacApellido LIKE %s
+                OR p.PacDNI LIKE %s
+            )
+        GROUP BY
+            p.PacCodigo,
+            p.PacNombre,
+            p.PacApellido,
+            p.PacDNI,
+            p.PacTelefono,
+            p.PacTipoSangre,
+            p.PacAlergias,
+            p.PacPeso
+        ORDER BY UltimaCita DESC, p.PacNombre, p.PacApellido
+        """,
+        (doc_codigo, search_term, pattern, pattern, pattern),
+    )
+    pacientes = cursor.fetchall()
+    cursor.close()
+    return pacientes
+
+
+def get_doctor_patient_profile(conn, doc_codigo, pac_codigo):
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        SELECT
+            p.PacCodigo,
+            p.PacNombre,
+            p.PacApellido,
+            p.PacDNI,
+            p.PacTelefono,
+            p.PacDireccion,
+            p.PacTipoSangre,
+            p.PacAlergias,
+            p.PacPeso,
+            COUNT(DISTINCT c.CitCodigo) AS TotalCitasConDoctor,
+            MAX(c.CitFecha) AS UltimaCitaConDoctor
+        FROM pacientes p
+        INNER JOIN citas c ON p.PacCodigo = c.PacCodigo
+        WHERE p.PacCodigo = %s
+            AND c.DocCodigo = %s
+        GROUP BY
+            p.PacCodigo,
+            p.PacNombre,
+            p.PacApellido,
+            p.PacDNI,
+            p.PacTelefono,
+            p.PacDireccion,
+            p.PacTipoSangre,
+            p.PacAlergias,
+            p.PacPeso
+        """,
+        (pac_codigo, doc_codigo),
+    )
+    paciente = cursor.fetchone()
+    cursor.close()
+    return paciente
+
+
+def get_patient_consultations(conn, pac_codigo):
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        SELECT
+            c.CitCodigo,
+            c.CitFecha,
+            c.CitHora,
+            c.CitEstado,
+            c.CitMotivo,
+            hc.HcCodigo,
+            hc.HcDiagnostico,
+            hc.HcTratamiento,
+            hc.HcObservaciones,
+            CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
+            d.DocEspecialidad
+        FROM citas c
+        INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        LEFT JOIN historial_clinico hc ON c.CitCodigo = hc.CitCodigo
+        WHERE c.PacCodigo = %s
+        ORDER BY c.CitFecha DESC, c.CitHora DESC
+        """,
+        (pac_codigo,),
+    )
+    consultas = cursor.fetchall()
+    cursor.close()
+    return consultas
+
+
+def get_time_minutes(value):
+    if hasattr(value, "hour"):
+        return value.hour * 60 + value.minute
+    if hasattr(value, "total_seconds"):
+        total_seconds = int(value.total_seconds())
+        return total_seconds // 60
+    hours, minutes = str(value).split(":")[:2]
+    return int(hours) * 60 + int(minutes)
+
+
+def get_doctor_current_appointment(citas):
+    today = datetime.now().date()
+    citas_hoy = [
+        cita
+        for cita in citas
+        if cita["CitFecha"] == today and cita["CitEstado"] != "Cancelada"
+    ]
+    if not citas_hoy:
+        return None
+
+    now_minutes = datetime.now().hour * 60 + datetime.now().minute
+    futuras = [cita for cita in citas_hoy if get_time_minutes(cita["CitHora"]) >= now_minutes]
+    if futuras:
+        return futuras[0]
+    return citas_hoy[-1]
+
+
 def get_admin_metrics(conn):
     cursor = conn.cursor(dictionary=True)
     metrics = {}
@@ -559,16 +860,14 @@ def get_admin_metrics(conn):
 @app.route("/")
 def index():
     if current_user.is_authenticated:
-        if current_user.rol == "admin":
-            return redirect(url_for("admin_dashboard"))
-        return redirect(url_for("mi_panel"))
+        return redirect(url_for(dashboard_endpoint_for_role(current_user.rol)))
     return render_template("index.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("admin_dashboard" if current_user.rol == "admin" else "mi_panel"))
+        return redirect(url_for(dashboard_endpoint_for_role(current_user.rol)))
 
     if request.method == "POST":
         username = request.form["username"].strip()
@@ -581,14 +880,17 @@ def login():
             SELECT
                 u.UsuCodigo,
                 u.PacCodigo,
+                u.DocCodigo,
                 u.UsuNombre,
                 u.UsuUsername,
                 u.UsuCorreo,
                 u.UsuPasswordHash,
                 u.UsuRol,
-                CONCAT(IFNULL(p.PacNombre, ''), ' ', IFNULL(p.PacApellido, '')) AS PacienteNombre
+                CONCAT(IFNULL(p.PacNombre, ''), ' ', IFNULL(p.PacApellido, '')) AS PacienteNombre,
+                CONCAT(IFNULL(d.DocNombre, ''), ' ', IFNULL(d.DocApellido, '')) AS DoctorNombre
             FROM usuarios u
             LEFT JOIN pacientes p ON u.PacCodigo = p.PacCodigo
+            LEFT JOIN doctores d ON u.DocCodigo = d.DocCodigo
             WHERE u.UsuUsername = %s AND u.UsuActivo = 1
             LIMIT 1
             """,
@@ -607,9 +909,7 @@ def login():
         next_page = request.args.get("next")
         if next_page:
             return redirect(next_page)
-        if user_row["UsuRol"] == "admin":
-            return redirect(url_for("admin_dashboard"))
-        return redirect(url_for("mi_panel"))
+        return redirect(url_for(dashboard_endpoint_for_role(user_row["UsuRol"])))
 
     return render_template("auth/login.html")
 
@@ -775,6 +1075,145 @@ def mi_historial():
     return render_template("paciente/historial.html", historial=historial)
 
 
+@app.route("/doctor/")
+@login_required
+@doctor_required
+def doctor_panel():
+    conn = get_db_connection()
+    doctor = get_doctor_profile(conn, current_user.doc_codigo)
+    citas = get_doctor_appointments(conn, current_user.doc_codigo)
+    horarios = get_doctor_schedule_entries(conn, current_user.doc_codigo)
+    pacientes = get_doctor_patients(conn, current_user.doc_codigo)
+    conn.close()
+
+    citas_hoy = [cita for cita in citas if cita["CitFecha"] == datetime.now().date()]
+    metrics = {
+        "total_citas": len(citas),
+        "citas_hoy": len(citas_hoy),
+        "pacientes_unicos": len({cita["PacCodigo"] for cita in citas}),
+        "horarios_activos": len([horario for horario in horarios if horario["HorActivo"]]),
+        "historiales_pendientes": len(
+            [
+                cita
+                for cita in citas
+                if cita["CitEstado"] != "Cancelada" and not cita["HcCodigo"]
+            ]
+        ),
+    }
+
+    return render_template(
+        "doctor/dashboard.html",
+        doctor=doctor,
+        metrics=metrics,
+        citas=citas[:5],
+        horarios=horarios[:4],
+        pacientes=pacientes[:5],
+        cita_actual=get_doctor_current_appointment(citas),
+    )
+
+
+@app.route("/doctor/agenda")
+@login_required
+@doctor_required
+def doctor_agenda():
+    conn = get_db_connection()
+    citas = get_doctor_appointments(conn, current_user.doc_codigo)
+    conn.close()
+    return render_template(
+        "doctor/agenda.html",
+        lista_citas=citas,
+        resumen=get_citas_resumen(citas),
+        cita_actual=get_doctor_current_appointment(citas),
+    )
+
+
+@app.route("/doctor/horarios", methods=["GET", "POST"])
+@login_required
+@doctor_required
+def doctor_horarios():
+    conn = get_db_connection()
+
+    if request.method == "POST":
+        dia_semana = request.form["HorDiaSemana"].lower()
+        hora_inicio = request.form["HorHoraInicio"]
+        hora_fin = request.form["HorHoraFin"]
+
+        if hora_inicio >= hora_fin:
+            flash("La hora de inicio debe ser menor que la hora de fin.", "danger")
+        else:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO horarios_medicos (
+                    DocCodigo,
+                    HorDiaSemana,
+                    HorHoraInicio,
+                    HorHoraFin,
+                    HorActivo
+                ) VALUES (%s, %s, %s, %s, %s)
+                """,
+                (current_user.doc_codigo, dia_semana, hora_inicio, hora_fin, 1),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash("Tu horario fue actualizado.", "success")
+            return redirect(url_for("doctor_horarios"))
+
+    doctor = get_doctor_profile(conn, current_user.doc_codigo)
+    horarios = get_doctor_schedule_entries(conn, current_user.doc_codigo)
+    conn.close()
+    return render_template("doctor/horarios.html", doctor=doctor, horarios=horarios, dias=DIAS_SEMANA)
+
+
+@app.route("/doctor/horarios/eliminar/<string:codigo>", methods=["POST"])
+@login_required
+@doctor_required
+def doctor_horarios_eliminar(codigo):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM horarios_medicos WHERE HorCodigo = %s AND DocCodigo = %s",
+        (codigo, current_user.doc_codigo),
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    flash("Bloque de horario eliminado.", "info")
+    return redirect(url_for("doctor_horarios"))
+
+
+@app.route("/doctor/pacientes")
+@login_required
+@doctor_required
+def doctor_pacientes():
+    search = request.args.get("q", "").strip()
+    conn = get_db_connection()
+    pacientes = get_doctor_patients(conn, current_user.doc_codigo, search)
+    conn.close()
+    return render_template("doctor/pacientes.html", pacientes=pacientes, search=search)
+
+
+@app.route("/doctor/pacientes/<string:codigo>")
+@login_required
+@doctor_required
+def doctor_paciente_detalle(codigo):
+    conn = get_db_connection()
+    paciente = get_doctor_patient_profile(conn, current_user.doc_codigo, codigo)
+    if not paciente:
+        conn.close()
+        flash("No tienes acceso a ese paciente o aun no tiene citas contigo.", "danger")
+        return redirect(url_for("doctor_pacientes"))
+
+    consultas = get_patient_consultations(conn, codigo)
+    conn.close()
+    return render_template(
+        "doctor/paciente_detalle.html",
+        paciente=paciente,
+        consultas=consultas,
+    )
+
+
 # ==========================================
 # CRUD 1: ESPECIALIDAD
 # ==========================================
@@ -871,8 +1310,23 @@ def especialidad_eliminar(codigo):
 @admin_required
 def doctores_index():
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM doctores")
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        SELECT
+            d.DocCodigo,
+            d.DocNombre,
+            d.DocApellido,
+            d.DocEspecialidad,
+            d.DocTelefono,
+            d.DocCorreo,
+            u.UsuCodigo,
+            u.UsuUsername
+        FROM doctores d
+        LEFT JOIN usuarios u ON d.DocCodigo = u.DocCodigo AND u.UsuRol = 'doctor'
+        ORDER BY d.DocNombre, d.DocApellido
+        """
+    )
     datos = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -891,6 +1345,22 @@ def doctores_agregar():
         especialidad = request.form["DocEspecialidad"]
         telefono = request.form["DocTelefono"]
         correo = request.form["DocCorreo"]
+        usuario = request.form["UsuUsername"].strip()
+        correo_usuario = request.form["UsuCorreo"].strip()
+        password = request.form["UsuPassword"]
+
+        if (usuario and not password) or (password and not usuario):
+            cursor.close()
+            conn.close()
+            flash("Para crear el acceso del doctor debes indicar usuario y contrasena.", "danger")
+            return render_template("doctores/agregar.html")
+
+        if usuario and username_exists(conn, usuario):
+            cursor.close()
+            conn.close()
+            flash("Ese nombre de usuario ya esta en uso.", "danger")
+            return render_template("doctores/agregar.html")
+
         cursor.execute(
             """
             INSERT INTO doctores (
@@ -903,6 +1373,34 @@ def doctores_agregar():
             """,
             (nombre, apellido, especialidad, telefono, correo),
         )
+        doc_codigo = cursor.lastrowid
+
+        if usuario and password:
+            cursor.execute(
+                """
+                INSERT INTO usuarios (
+                    PacCodigo,
+                    DocCodigo,
+                    UsuNombre,
+                    UsuUsername,
+                    UsuCorreo,
+                    UsuPasswordHash,
+                    UsuRol,
+                    UsuActivo
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    None,
+                    doc_codigo,
+                    f"{nombre} {apellido}",
+                    usuario,
+                    correo_usuario or None,
+                    generate_password_hash(password),
+                    "doctor",
+                    1,
+                ),
+            )
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -917,8 +1415,26 @@ def doctores_agregar():
 def doctores_editar(codigo):
     if request.method == "GET":
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM doctores WHERE DocCodigo = %s", (codigo,))
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                d.DocCodigo,
+                d.DocNombre,
+                d.DocApellido,
+                d.DocEspecialidad,
+                d.DocTelefono,
+                d.DocCorreo,
+                u.UsuCodigo,
+                u.UsuUsername,
+                IFNULL(u.UsuCorreo, '') AS UsuCorreo
+            FROM doctores d
+            LEFT JOIN usuarios u ON d.DocCodigo = u.DocCodigo AND u.UsuRol = 'doctor'
+            WHERE d.DocCodigo = %s
+            LIMIT 1
+            """,
+            (codigo,),
+        )
         doctor = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -931,6 +1447,23 @@ def doctores_editar(codigo):
     especialidad = request.form["DocEspecialidad"]
     telefono = request.form["DocTelefono"]
     correo = request.form["DocCorreo"]
+    usu_codigo = request.form["UsuCodigo"] or None
+    usuario = request.form["UsuUsername"].strip()
+    correo_usuario = request.form["UsuCorreo"].strip()
+    password = request.form["UsuPassword"]
+
+    if (usuario and not usu_codigo and not password) or (password and not usuario):
+        cursor.close()
+        conn.close()
+        flash("Para crear el acceso del doctor debes indicar usuario y contrasena.", "danger")
+        return redirect(url_for("doctores_editar", codigo=codigo))
+
+    if usuario and username_exists(conn, usuario, usu_codigo):
+        cursor.close()
+        conn.close()
+        flash("Ese nombre de usuario ya esta en uso.", "danger")
+        return redirect(url_for("doctores_editar", codigo=codigo))
+
     cursor.execute(
         """
         UPDATE doctores
@@ -944,6 +1477,65 @@ def doctores_editar(codigo):
         """,
         (nombre, apellido, especialidad, telefono, correo, codigo),
     )
+
+    if usu_codigo and usuario:
+        if password:
+            cursor.execute(
+                """
+                UPDATE usuarios
+                SET
+                    UsuNombre = %s,
+                    UsuUsername = %s,
+                    UsuCorreo = %s,
+                    UsuPasswordHash = %s
+                WHERE UsuCodigo = %s
+                """,
+                (
+                    f"{nombre} {apellido}",
+                    usuario,
+                    correo_usuario or None,
+                    generate_password_hash(password),
+                    usu_codigo,
+                ),
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE usuarios
+                SET
+                    UsuNombre = %s,
+                    UsuUsername = %s,
+                    UsuCorreo = %s
+                WHERE UsuCodigo = %s
+                """,
+                (f"{nombre} {apellido}", usuario, correo_usuario or None, usu_codigo),
+            )
+    elif usuario and password:
+        cursor.execute(
+            """
+            INSERT INTO usuarios (
+                PacCodigo,
+                DocCodigo,
+                UsuNombre,
+                UsuUsername,
+                UsuCorreo,
+                UsuPasswordHash,
+                UsuRol,
+                UsuActivo
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                None,
+                codigo,
+                f"{nombre} {apellido}",
+                usuario,
+                correo_usuario or None,
+                generate_password_hash(password),
+                "doctor",
+                1,
+            ),
+        )
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -957,8 +1549,19 @@ def doctores_editar(codigo):
 def doctores_eliminar(codigo):
     if request.method == "GET":
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM doctores WHERE DocCodigo = %s", (codigo,))
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                DocCodigo,
+                DocNombre,
+                DocApellido,
+                DocEspecialidad
+            FROM doctores
+            WHERE DocCodigo = %s
+            """,
+            (codigo,),
+        )
         doctor = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -966,6 +1569,7 @@ def doctores_eliminar(codigo):
 
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("DELETE FROM usuarios WHERE DocCodigo = %s", (codigo,))
     cursor.execute("DELETE FROM doctores WHERE DocCodigo=%s", (codigo,))
     conn.commit()
     cursor.close()
@@ -1582,14 +2186,17 @@ def horarios_eliminar(codigo):
 # ==========================================
 @app.route("/historial/<string:codigo>", methods=["GET", "POST"])
 @login_required
-@admin_required
 def historial_editar(codigo):
+    if current_user.rol not in ("admin", "doctor"):
+        flash("No tienes permiso para gestionar historiales clinicos.", "danger")
+        return redirect(url_for(dashboard_endpoint_for_role(current_user.rol)))
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute(
-        """
+    query = """
         SELECT
             c.CitCodigo,
+            c.DocCodigo,
             c.CitFecha,
             c.CitHora,
             c.CitMotivo,
@@ -1600,10 +2207,20 @@ def historial_editar(codigo):
         INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
         INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
         WHERE c.CitCodigo = %s
-        """,
-        (codigo,),
-    )
+    """
+    params = [codigo]
+    if current_user.rol == "doctor":
+        query += " AND c.DocCodigo = %s"
+        params.append(current_user.doc_codigo)
+
+    cursor.execute(query, tuple(params))
     cita = cursor.fetchone()
+
+    if not cita:
+        cursor.close()
+        conn.close()
+        flash("La cita no existe o no tienes acceso para editar su historial.", "danger")
+        return redirect(url_for("doctor_agenda" if current_user.rol == "doctor" else "citas_index"))
 
     cursor.execute(
         """
@@ -1652,7 +2269,7 @@ def historial_editar(codigo):
         cursor.close()
         conn.close()
         flash("Historial clinico guardado.", "success")
-        return redirect(url_for("citas_index"))
+        return redirect(url_for("doctor_agenda" if current_user.rol == "doctor" else "citas_index"))
 
     cursor.close()
     conn.close()

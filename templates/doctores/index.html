@@ -6,13 +6,13 @@
 <section class="page-card">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Equipo médico</span>
+            <span class="eyebrow">Equipo medico</span>
             <h1>Listado de doctores</h1>
-            <p>Gestiona al personal médico con una tabla más ordenada, mejor contraste y botones visualmente consistentes.</p>
+            <p>Gestiona al personal medico, sus especialidades y el acceso de login para que puedan entrar a su panel clinico.</p>
         </div>
         <div class="section-actions">
             <a href="{{ url_for('doctores_agregar') }}" class="btn btn-brand">Nuevo doctor</a>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-soft">Volver al inicio</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-soft">Volver al panel</a>
         </div>
     </div>
 
@@ -20,32 +20,37 @@
         <table class="table align-middle">
             <thead>
                 <tr>
-                    <th>Código</th>
+                    <th>Codigo</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Especialidad</th>
-                    <th>Teléfono</th>
+                    <th>Telefono</th>
                     <th>Correo</th>
+                    <th>Acceso</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for doc in lista_doctores %}
                 <tr>
-                    <td class="text-strong">{{ doc.0 }}</td>
-                    <td class="text-strong">{{ doc.1 }}</td>
-                    <td>{{ doc.2 }}</td>
-                    <td>{{ doc.3 }}</td>
-                    <td>{{ doc.4 }}</td>
-                    <td>{{ doc.5 }}</td>
+                    <td class="text-strong">{{ doc.DocCodigo }}</td>
+                    <td class="text-strong">{{ doc.DocNombre }}</td>
+                    <td>{{ doc.DocApellido }}</td>
+                    <td>{{ doc.DocEspecialidad }}</td>
+                    <td>{{ doc.DocTelefono or 'Sin telefono' }}</td>
+                    <td>{{ doc.DocCorreo or 'Sin correo' }}</td>
+                    <td class="stacked-text">
+                        <strong>{{ 'Habilitado' if doc.UsuCodigo else 'Sin acceso' }}</strong>
+                        <span>{{ doc.UsuUsername if doc.UsuUsername else 'Crear login desde Editar' }}</span>
+                    </td>
                     <td class="actions-cell">
-                        <a href="{{ url_for('doctores_editar', codigo=doc.0) }}" class="btn btn-edit btn-sm">Editar</a>
-                        <a href="{{ url_for('doctores_eliminar', codigo=doc.0) }}" class="btn btn-delete btn-sm">Eliminar</a>
+                        <a href="{{ url_for('doctores_editar', codigo=doc.DocCodigo) }}" class="btn btn-edit btn-sm">Editar</a>
+                        <a href="{{ url_for('doctores_eliminar', codigo=doc.DocCodigo) }}" class="btn btn-delete btn-sm">Eliminar</a>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="empty-state">Aún no hay doctores registrados.</td>
+                    <td colspan="8" class="empty-state">Aun no hay doctores registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

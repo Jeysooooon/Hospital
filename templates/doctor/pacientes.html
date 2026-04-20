@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Pacientes del Doctor | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Lista de pacientes</span>
+            <h1>Busqueda de antecedentes</h1>
+            <p>Busca pacientes que ya tienen o han tenido cita contigo para revisar rapidamente su informacion previa antes de la consulta.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('doctor_panel') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </div>
+
+    <form method="GET" class="form-card mb-4">
+        <div class="row g-4 align-items-end">
+            <div class="col-md-9">
+                <label for="q" class="form-label">Buscar por nombre o DNI</label>
+                <input type="text" id="q" name="q" class="form-control" value="{{ search }}" placeholder="Ejemplo: Maria Lopez o 0801...">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-brand w-100">Buscar paciente</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>DNI</th>
+                    <th>Telefono</th>
+                    <th>Tipo sangre</th>
+                    <th>Ultima cita</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paciente in pacientes %}
+                <tr>
+                    <td class="stacked-text">
+                        <strong>{{ paciente.PacNombre }} {{ paciente.PacApellido }}</strong>
+                        <span>{{ paciente.TotalCitas }} citas contigo</span>
+                    </td>
+                    <td>{{ paciente.PacDNI }}</td>
+                    <td>{{ paciente.PacTelefono or 'Sin telefono' }}</td>
+                    <td>{{ paciente.PacTipoSangre or 'No definido' }}</td>
+                    <td>{{ paciente.UltimaCita or 'Sin cita previa' }}</td>
+                    <td class="actions-cell">
+                        <a href="{{ url_for('doctor_paciente_detalle', codigo=paciente.PacCodigo) }}" class="btn btn-edit btn-sm">Ver antecedentes</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="empty-state">No encontramos pacientes con ese criterio en tu agenda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -46,6 +46,19 @@
                             <li class="nav-item">
                                 <a class="nav-link {% if request.path.startswith('/citas') or request.path.startswith('/historial') %}active{% endif %}" href="{{ url_for('citas_index') }}">Citas</a>
                             </li>
+                            {% elif current_user.rol == 'doctor' %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/doctor/' %}active{% endif %}" href="{{ url_for('doctor_panel') }}">Panel doctor</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/doctor/agenda') or request.path.startswith('/historial') %}active{% endif %}" href="{{ url_for('doctor_agenda') }}">Mi agenda</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/doctor/horarios') %}active{% endif %}" href="{{ url_for('doctor_horarios') }}">Mis horarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/doctor/pacientes') %}active{% endif %}" href="{{ url_for('doctor_pacientes') }}">Pacientes</a>
+                            </li>
                             {% else %}
                             <li class="nav-item">
                                 <a class="nav-link {% if request.path.startswith('/mi-panel') %}active{% endif %}" href="{{ url_for('mi_panel') }}">Mi panel</a>

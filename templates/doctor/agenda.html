@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Agenda | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Mi agenda</span>
+            <h1>Citas asignadas al doctor</h1>
+            <p>Esta vista filtra automaticamente las citas por tu DocCodigo y te deja abrir cada consulta para completar diagnostico y tratamiento.</p>
+        </div>
+        <div class="section-actions">
+            {% if cita_actual %}
+            <a href="{{ url_for('historial_editar', codigo=cita_actual.CitCodigo) }}" class="btn btn-brand">Abrir cita actual</a>
+            {% endif %}
+            <a href="{{ url_for('doctor_panel') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <article class="summary-card">
+            <span>Total</span>
+            <strong>{{ resumen.total }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Programadas</span>
+            <strong>{{ resumen.programadas }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Confirmadas</span>
+            <strong>{{ resumen.confirmadas }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Completadas</span>
+            <strong>{{ resumen.completadas }}</strong>
+        </article>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Paciente</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Historial</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in lista_citas %}
+                <tr>
+                    <td class="text-strong">{{ cita.CitFecha }} {{ cita.CitHora }}</td>
+                    <td class="stacked-text">
+                        <strong>{{ cita.PacienteNombre }}</strong>
+                        <span>{{ cita.PacTipoSangre or 'Tipo no definido' }}</span>
+                    </td>
+                    <td class="stacked-text">
+                        <strong>{{ cita.CitMotivo }}</strong>
+                        <span>{{ cita.CitObservaciones or 'Sin observaciones' }}</span>
+                    </td>
+                    <td>
+                        {% set estado = cita.CitEstado|lower %}
+                        <span class="status-badge
+                            {% if estado == 'programada' %}status-programada{% endif %}
+                            {% if estado == 'confirmada' %}status-confirmada{% endif %}
+                            {% if estado == 'completada' %}status-completada{% endif %}
+                            {% if estado == 'cancelada' %}status-cancelada{% endif %}
+                        ">
+                            {{ cita.CitEstado }}
+                        </span>
+                    </td>
+                    <td>{{ 'Completo' if cita.HcCodigo else 'Pendiente' }}</td>
+                    <td class="actions-cell">
+                        <a href="{{ url_for('historial_editar', codigo=cita.CitCodigo) }}" class="btn btn-edit btn-sm">
+                            {{ 'Editar historial' if cita.HcCodigo else 'Gestionar consulta' }}
+                        </a>
+                        <a href="{{ url_for('doctor_paciente_detalle', codigo=cita.PacCodigo) }}" class="btn btn-outline-soft btn-sm">Ver paciente</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="empty-state">Aun no tienes citas registradas en tu agenda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

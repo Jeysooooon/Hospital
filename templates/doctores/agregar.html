@@ -8,7 +8,7 @@
         <div>
             <span class="eyebrow">Nuevo registro</span>
             <h1>Agregar doctor</h1>
-            <p>Ingresa la información principal del profesional para mantener actualizado el equipo médico.</p>
+            <p>Ingresa la informacion principal del profesional y, si quieres, crea de una vez su acceso al panel medico.</p>
         </div>
     </div>
 
@@ -27,12 +27,30 @@
                 <input type="text" id="DocEspecialidad" name="DocEspecialidad" class="form-control" required>
             </div>
             <div class="col-md-6">
-                <label for="DocTelefono" class="form-label">Teléfono</label>
+                <label for="DocTelefono" class="form-label">Telefono</label>
                 <input type="text" id="DocTelefono" name="DocTelefono" class="form-control">
             </div>
             <div class="col-12">
-                <label for="DocCorreo" class="form-label">Correo electrónico</label>
+                <label for="DocCorreo" class="form-label">Correo profesional</label>
                 <input type="email" id="DocCorreo" name="DocCorreo" class="form-control" placeholder="doctor@hospital.com">
+            </div>
+        </div>
+
+        <div class="divider-title mt-4">Acceso del doctor</div>
+        <p class="helper-text">Si este doctor debe iniciar sesion, agrega usuario y contrasena para habilitar su portal.</p>
+
+        <div class="row g-4 mt-1">
+            <div class="col-md-6">
+                <label for="UsuUsername" class="form-label">Usuario</label>
+                <input type="text" id="UsuUsername" name="UsuUsername" class="form-control" placeholder="doctor.hernandez">
+            </div>
+            <div class="col-md-6">
+                <label for="UsuCorreo" class="form-label">Correo de acceso</label>
+                <input type="email" id="UsuCorreo" name="UsuCorreo" class="form-control" placeholder="acceso@hospital.com">
+            </div>
+            <div class="col-12">
+                <label for="UsuPassword" class="form-label">Contrasena</label>
+                <input type="password" id="UsuPassword" name="UsuPassword" class="form-control" placeholder="Necesaria si vas a habilitar el login">
             </div>
         </div>
 

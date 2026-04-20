@@ -9,7 +9,7 @@
         <div class="auth-copy">
             <span class="eyebrow">Acceso seguro</span>
             <h1>Portal clinico ProHospital</h1>
-            <p>Administradores y pacientes ingresan desde aqui. La pantalla de acceso ahora sigue el mismo estilo hospitalario del Inicio para mantener una experiencia coherente desde el primer paso.</p>
+            <p>Administradores, pacientes y doctores ingresan desde aqui. Cada perfil aterriza en un panel propio con accesos acordes a su trabajo dentro del sistema.</p>
 
             <div class="doctor-showcase">
                 <img src="{{ url_for('static', filename='img/doctor-hero.svg') }}" alt="Ilustracion de doctor para la pantalla de acceso" class="doctor-illustration">
@@ -26,7 +26,7 @@
                 </article>
                 <article class="benefit-item">
                     <strong>Acceso por perfiles</strong>
-                    <span>Cada usuario entra a su panel con informacion y acciones relevantes.</span>
+                    <span>Cada usuario entra a su panel con informacion y acciones relevantes, incluida la agenda clinica del doctor.</span>
                 </article>
             </div>
         </div>
@@ -35,7 +35,7 @@
             <div class="row g-4">
                 <div class="col-12">
                     <label for="username" class="form-label">Usuario</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="admin o usuario del paciente" required>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="admin, doctor.lopez o usuario del paciente" required>
                 </div>
                 <div class="col-12">
                     <label for="password" class="form-label">Contrasena</label>

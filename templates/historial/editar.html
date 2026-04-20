@@ -49,7 +49,7 @@
 
         <div class="form-actions mt-4">
             <button type="submit" class="btn btn-brand">Guardar historial</button>
-            <a href="{{ url_for('citas_index') }}" class="btn btn-outline-soft">Cancelar</a>
+            <a href="{{ url_for('doctor_agenda' if current_user.rol == 'doctor' else 'citas_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>
 </section>

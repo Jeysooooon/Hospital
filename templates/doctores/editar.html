@@ -6,38 +6,58 @@
 <section class="page-card narrow-page">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Edición</span>
+            <span class="eyebrow">Edicion</span>
             <h1>Editar doctor</h1>
-            <p>Ajusta la información del registro para mantener exactos los datos del personal médico.</p>
+            <p>Ajusta la informacion del profesional y actualiza tambien sus credenciales de acceso cuando sea necesario.</p>
         </div>
     </div>
 
     <form action="" method="POST" class="form-card">
+        <input type="hidden" name="UsuCodigo" value="{{ doctor.UsuCodigo if doctor else '' }}">
+
         <div class="row g-4">
             <div class="col-md-6">
                 <label for="DocNombre" class="form-label">Nombre</label>
-                <input type="text" id="DocNombre" name="DocNombre" class="form-control" value="{{ doctor.1 }}" required>
+                <input type="text" id="DocNombre" name="DocNombre" class="form-control" value="{{ doctor.DocNombre }}" required>
             </div>
             <div class="col-md-6">
                 <label for="DocApellido" class="form-label">Apellido</label>
-                <input type="text" id="DocApellido" name="DocApellido" class="form-control" value="{{ doctor.2 }}" required>
+                <input type="text" id="DocApellido" name="DocApellido" class="form-control" value="{{ doctor.DocApellido }}" required>
             </div>
             <div class="col-md-6">
                 <label for="DocEspecialidad" class="form-label">Especialidad</label>
-                <input type="text" id="DocEspecialidad" name="DocEspecialidad" class="form-control" value="{{ doctor.3 }}" required>
+                <input type="text" id="DocEspecialidad" name="DocEspecialidad" class="form-control" value="{{ doctor.DocEspecialidad }}" required>
             </div>
             <div class="col-md-6">
-                <label for="DocTelefono" class="form-label">Teléfono</label>
-                <input type="text" id="DocTelefono" name="DocTelefono" class="form-control" value="{{ doctor.4 }}">
+                <label for="DocTelefono" class="form-label">Telefono</label>
+                <input type="text" id="DocTelefono" name="DocTelefono" class="form-control" value="{{ doctor.DocTelefono or '' }}">
             </div>
             <div class="col-12">
-                <label for="DocCorreo" class="form-label">Correo electrónico</label>
-                <input type="email" id="DocCorreo" name="DocCorreo" class="form-control" value="{{ doctor.5 }}">
+                <label for="DocCorreo" class="form-label">Correo profesional</label>
+                <input type="email" id="DocCorreo" name="DocCorreo" class="form-control" value="{{ doctor.DocCorreo or '' }}">
+            </div>
+        </div>
+
+        <div class="divider-title mt-4">Acceso del doctor</div>
+        <p class="helper-text">Puedes actualizar el usuario existente o crear el acceso si este doctor aun no inicia sesion en el sistema.</p>
+
+        <div class="row g-4 mt-1">
+            <div class="col-md-6">
+                <label for="UsuUsername" class="form-label">Usuario</label>
+                <input type="text" id="UsuUsername" name="UsuUsername" class="form-control" value="{{ doctor.UsuUsername if doctor else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label for="UsuCorreo" class="form-label">Correo de acceso</label>
+                <input type="email" id="UsuCorreo" name="UsuCorreo" class="form-control" value="{{ doctor.UsuCorreo if doctor else '' }}">
+            </div>
+            <div class="col-12">
+                <label for="UsuPassword" class="form-label">Contrasena</label>
+                <input type="password" id="UsuPassword" name="UsuPassword" class="form-control" placeholder="Solo llenala si deseas crear o cambiar la contrasena">
             </div>
         </div>
 
         <div class="form-actions mt-4">
-            <button type="submit" class="btn btn-brand">Actualizar información</button>
+            <button type="submit" class="btn btn-brand">Actualizar informacion</button>
             <a href="{{ url_for('doctores_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>

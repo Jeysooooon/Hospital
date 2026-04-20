@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Horarios | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Disponibilidad propia</span>
+            <h1>Mis horarios medicos</h1>
+            <p>Configura aqui los tramos en los que estaras disponible para atender. El sistema usara estos bloques para validar nuevas citas.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('doctor_panel') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </div>
+
+    <div class="home-grid">
+        <article class="home-card">
+            <span class="home-card-tag">{{ doctor.DocEspecialidad }}</span>
+            <h2>{{ doctor.DocNombre }} {{ doctor.DocApellido }}</h2>
+            <p>Agrega o elimina bloques desde aqui. Cada fila queda asociada automaticamente a tu usuario de doctor.</p>
+        </article>
+
+        <form method="POST" class="form-card">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label for="HorDiaSemana" class="form-label">Dia</label>
+                    <select id="HorDiaSemana" name="HorDiaSemana" class="form-control" required>
+                        <option value="">Selecciona un dia</option>
+                        {% for dia in dias %}
+                        <option value="{{ dia }}">{{ dia|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="HorHoraInicio" class="form-label">Hora inicio</label>
+                    <input type="time" id="HorHoraInicio" name="HorHoraInicio" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="HorHoraFin" class="form-label">Hora fin</label>
+                    <input type="time" id="HorHoraFin" name="HorHoraFin" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-actions mt-4">
+                <button type="submit" class="btn btn-save">Agregar bloque</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-card mt-4">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Dia</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for horario in horarios %}
+                <tr>
+                    <td class="text-strong">{{ horario.HorDiaSemana|title }}</td>
+                    <td>{{ horario.HorHoraInicio }}</td>
+                    <td>{{ horario.HorHoraFin }}</td>
+                    <td>{{ 'Activo' if horario.HorActivo else 'Inactivo' }}</td>
+                    <td class="actions-cell">
+                        <form action="{{ url_for('doctor_horarios_eliminar', codigo=horario.HorCodigo) }}" method="POST" class="inline-form">
+                            <button type="submit" class="btn btn-delete btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-state">Todavia no registras horarios medicos.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

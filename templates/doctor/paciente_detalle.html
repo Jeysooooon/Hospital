@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Antecedentes del Paciente | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Paciente</span>
+            <h1>{{ paciente.PacNombre }} {{ paciente.PacApellido }}</h1>
+            <p>Vista previa de antecedentes y consultas registradas para apoyar tu valoracion clinica antes de atender.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('doctor_pacientes') }}" class="btn btn-outline-soft">Volver a pacientes</a>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <article class="summary-card">
+            <span>DNI</span>
+            <strong>{{ paciente.PacDNI }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Telefono</span>
+            <strong>{{ paciente.PacTelefono or 'Sin telefono' }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Tipo sangre</span>
+            <strong>{{ paciente.PacTipoSangre or 'No definido' }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Citas contigo</span>
+            <strong>{{ paciente.TotalCitasConDoctor }}</strong>
+        </article>
+    </div>
+
+    <div class="confirm-grid mb-4">
+        <div class="confirm-item">
+            <span>Direccion</span>
+            <strong>{{ paciente.PacDireccion or 'Sin direccion registrada' }}</strong>
+        </div>
+        <div class="confirm-item">
+            <span>Alergias</span>
+            <strong>{{ paciente.PacAlergias or 'Sin alergias registradas' }}</strong>
+        </div>
+        <div class="confirm-item">
+            <span>Peso</span>
+            <strong>{% if paciente.PacPeso %}{{ paciente.PacPeso }} kg{% else %}Sin dato{% endif %}</strong>
+        </div>
+        <div class="confirm-item">
+            <span>Ultima cita contigo</span>
+            <strong>{{ paciente.UltimaCitaConDoctor or 'Sin registros' }}</strong>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Doctor</th>
+                    <th>Motivo</th>
+                    <th>Diagnostico</th>
+                    <th>Tratamiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas %}
+                <tr>
+                    <td class="text-strong">{{ consulta.CitFecha }} {{ consulta.CitHora }}</td>
+                    <td class="stacked-text">
+                        <strong>{{ consulta.DoctorNombre }}</strong>
+                        <span>{{ consulta.DocEspecialidad }}</span>
+                    </td>
+                    <td>{{ consulta.CitMotivo }}</td>
+                    <td>{{ consulta.HcDiagnostico or 'Sin diagnostico registrado' }}</td>
+                    <td>{{ consulta.HcTratamiento or 'Sin tratamiento registrado' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-state">Este paciente aun no tiene consultas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

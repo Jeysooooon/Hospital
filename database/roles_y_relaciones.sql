@@ -6,15 +6,19 @@ ALTER TABLE pacientes
 CREATE TABLE IF NOT EXISTS usuarios (
     UsuCodigo INT AUTO_INCREMENT PRIMARY KEY,
     PacCodigo INT NULL UNIQUE,
+    DocCodigo INT NULL UNIQUE,
     UsuNombre VARCHAR(120) NOT NULL,
     UsuUsername VARCHAR(80) NOT NULL UNIQUE,
     UsuCorreo VARCHAR(120) NULL,
     UsuPasswordHash VARCHAR(255) NOT NULL,
-    UsuRol ENUM('admin', 'paciente') NOT NULL DEFAULT 'paciente',
+    UsuRol ENUM('admin', 'paciente', 'doctor') NOT NULL DEFAULT 'paciente',
     UsuActivo TINYINT(1) NOT NULL DEFAULT 1,
     FechaCreacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_usuarios_pacientes
         FOREIGN KEY (PacCodigo) REFERENCES pacientes(PacCodigo)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_usuarios_doctores
+        FOREIGN KEY (DocCodigo) REFERENCES doctores(DocCodigo)
         ON DELETE SET NULL
 );
 

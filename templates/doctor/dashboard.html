@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Doctor | ProHospital{% endblock %}
+{% block body_class %}page-dashboard page-doctor{% endblock %}
+
+{% block content %}
+<section class="hero-panel dashboard-hero">
+    <div class="hero-layout">
+        <div class="hero-copy">
+            <span class="eyebrow">Doctor</span>
+            <h1 class="hero-title">Gestion clinica de tu consulta</h1>
+            <p class="hero-text">Revisa tu agenda, abre la cita mas cercana, actualiza tu disponibilidad y consulta antecedentes del paciente desde un solo tablero.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('doctor_agenda') }}" class="btn btn-brand">Abrir mi agenda</a>
+                <a href="{{ url_for('historial_editar', codigo=cita_actual.CitCodigo) if cita_actual else url_for('doctor_agenda') }}" class="btn btn-outline-soft {% if not cita_actual %}disabled{% endif %}" {% if not cita_actual %}aria-disabled="true"{% endif %}>
+                    {{ 'Abrir cita actual' if cita_actual else 'Sin cita actual' }}
+                </a>
+            </div>
+
+            <div class="summary-grid mt-4">
+                <article class="summary-card">
+                    <span>Citas totales</span>
+                    <strong>{{ metrics.total_citas }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Citas hoy</span>
+                    <strong>{{ metrics.citas_hoy }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Pacientes</span>
+                    <strong>{{ metrics.pacientes_unicos }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Horarios activos</span>
+                    <strong>{{ metrics.horarios_activos }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Historial pendiente</span>
+                    <strong>{{ metrics.historiales_pendientes }}</strong>
+                </article>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <aside class="dashboard-sidecard dashboard-sidecard-light">
+                <span class="dashboard-kicker">{{ doctor.DocEspecialidad }}</span>
+                <h2>Dr. {{ doctor.DocNombre }} {{ doctor.DocApellido }}</h2>
+                <p>Tu espacio clinico esta centrado en las citas asignadas a tu DocCodigo, con acceso rapido a horarios y antecedentes.</p>
+
+                <div class="insight-list">
+                    <div class="insight-item">
+                        <span>Telefono</span>
+                        <strong>{{ doctor.DocTelefono or 'Sin telefono' }}</strong>
+                    </div>
+                    <div class="insight-item">
+                        <span>Correo</span>
+                        <strong>{{ doctor.DocCorreo or 'Sin correo' }}</strong>
+                    </div>
+                    <div class="insight-item">
+                        <span>Proxima accion</span>
+                        <strong>{{ cita_actual.PacienteNombre if cita_actual else 'Revisar agenda' }}</strong>
+                    </div>
+                </div>
+
+                <div class="dashboard-pill-row">
+                    <span class="dashboard-pill">Mi agenda</span>
+                    <span class="dashboard-pill">Consulta activa</span>
+                    <span class="dashboard-pill">Seguimiento</span>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<section class="page-card mt-4">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Atencion inmediata</span>
+            <h1>Proximas citas</h1>
+            <p>Solo ves las citas asociadas a tu usuario de doctor para trabajar sobre tu propia agenda clinica.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('doctor_agenda') }}" class="btn btn-outline-soft">Ver agenda completa</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Paciente</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Consulta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas %}
+                <tr>
+                    <td class="text-strong">{{ cita.CitFecha }} {{ cita.CitHora }}</td>
+                    <td class="stacked-text">
+                        <strong>{{ cita.PacienteNombre }}</strong>
+                        <span>{{ cita.PacTelefono or 'Sin telefono' }}</span>
+                    </td>
+                    <td class="stacked-text">
+                        <strong>{{ cita.CitMotivo }}</strong>
+                        <span>{{ cita.CitObservaciones or 'Sin observaciones' }}</span>
+                    </td>
+                    <td>
+                        {% set estado = cita.CitEstado|lower %}
+                        <span class="status-badge
+                            {% if estado == 'programada' %}status-programada{% endif %}
+                            {% if estado == 'confirmada' %}status-confirmada{% endif %}
+                            {% if estado == 'completada' %}status-completada{% endif %}
+                            {% if estado == 'cancelada' %}status-cancelada{% endif %}
+                        ">
+                            {{ cita.CitEstado }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <a href="{{ url_for('historial_editar', codigo=cita.CitCodigo) }}" class="btn btn-edit btn-sm">
+                            {{ 'Editar historial' if cita.HcCodigo else 'Abrir consulta' }}
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-state">Todavia no tienes citas asignadas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="home-grid mt-4">
+    <article class="home-card">
+        <span class="home-card-tag">Disponibilidad</span>
+        <h2>Mis horarios</h2>
+        <p>Define tus bloques de atencion y ajustalos cada vez que cambie tu disponibilidad.</p>
+        <a href="{{ url_for('doctor_horarios') }}" class="btn btn-brand mt-3">Gestionar horarios</a>
+    </article>
+    <article class="home-card">
+        <span class="home-card-tag">Pacientes</span>
+        <h2>Lista de pacientes</h2>
+        <p>Busca pacientes vinculados a tus citas y revisa sus antecedentes antes de recibirlos.</p>
+        <a href="{{ url_for('doctor_pacientes') }}" class="btn btn-brand mt-3">Buscar pacientes</a>
+    </article>
+    <article class="home-card">
+        <span class="home-card-tag">Resumen</span>
+        <h2>Agenda semanal</h2>
+        <p>{% if horarios %}Tienes {{ horarios|length }} bloques de horario configurados en este momento.{% else %}Aun no registras bloques de horario para aceptar citas.{% endif %}</p>
+        <a href="{{ url_for('doctor_horarios') }}" class="btn btn-outline-soft mt-3">Ver disponibilidad</a>
+    </article>
+</section>
+{% endblock %}
