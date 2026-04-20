@@ -6,13 +6,13 @@
 <section class="page-card">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Agenda clínica</span>
+            <span class="eyebrow">Agenda clinica</span>
             <h1>Listado de citas</h1>
-            <p>Consulta rápidamente qué paciente será atendido, con qué doctor, en qué horario y en qué estado se encuentra la cita.</p>
+            <p>Consulta rapidamente que paciente sera atendido, con que doctor, en que horario y si ya tiene historial clinico asociado.</p>
         </div>
         <div class="section-actions">
             <a href="{{ url_for('citas_agregar') }}" class="btn btn-brand">Nueva cita</a>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-soft">Volver al inicio</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-soft">Volver al panel</a>
         </div>
     </div>
 
@@ -28,6 +28,10 @@
         <article class="summary-card">
             <span>Confirmadas</span>
             <strong>{{ resumen.confirmadas }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Completadas</span>
+            <strong>{{ resumen.completadas }}</strong>
         </article>
     </div>
 
@@ -47,40 +51,43 @@
             <tbody>
                 {% for cita in lista_citas %}
                 <tr>
-                    <td class="text-strong">{{ cita.1 }}</td>
-                    <td>{{ cita.2 }}</td>
+                    <td class="text-strong">{{ cita.CitFecha }}</td>
+                    <td>{{ cita.CitHora }}</td>
                     <td class="stacked-text">
-                        <strong>{{ cita.7 }}</strong>
-                        <span>Código #{{ cita.6 }}</span>
+                        <strong>{{ cita.PacienteNombre }}</strong>
+                        <span>Codigo #{{ cita.PacCodigo }}</span>
                     </td>
                     <td class="stacked-text">
-                        <strong>{{ cita.9 }}</strong>
-                        <span>{{ cita.10 }}</span>
+                        <strong>{{ cita.DoctorNombre }}</strong>
+                        <span>{{ cita.DocEspecialidad }}</span>
                     </td>
                     <td class="stacked-text">
-                        <strong>{{ cita.4 }}</strong>
-                        <span>{{ cita.5 or 'Sin observaciones adicionales' }}</span>
+                        <strong>{{ cita.CitMotivo }}</strong>
+                        <span>{{ cita.CitObservaciones or 'Sin observaciones adicionales' }}</span>
                     </td>
                     <td>
-                        {% set estado = cita.3|lower %}
+                        {% set estado = cita.CitEstado|lower %}
                         <span class="status-badge
                             {% if estado == 'programada' %}status-programada{% endif %}
                             {% if estado == 'confirmada' %}status-confirmada{% endif %}
                             {% if estado == 'completada' %}status-completada{% endif %}
                             {% if estado == 'cancelada' %}status-cancelada{% endif %}
                         ">
-                            {{ cita.3 }}
+                            {{ cita.CitEstado }}
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <a href="{{ url_for('citas_editar', codigo=cita.0) }}" class="btn btn-edit btn-sm">Editar</a>
-                        <a href="{{ url_for('citas_eliminar', codigo=cita.0) }}" class="btn btn-delete btn-sm">Eliminar</a>
+                        <a href="{{ url_for('citas_editar', codigo=cita.CitCodigo) }}" class="btn btn-edit btn-sm">Editar</a>
+                        <a href="{{ url_for('historial_editar', codigo=cita.CitCodigo) }}" class="btn btn-outline-soft btn-sm">
+                            {{ 'Editar historial' if cita.HcCodigo else 'Crear historial' }}
+                        </a>
+                        <a href="{{ url_for('citas_eliminar', codigo=cita.CitCodigo) }}" class="btn btn-delete btn-sm">Eliminar</a>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
                     <td colspan="7" class="empty-state">
-                        Aún no hay citas registradas. Crea la primera para empezar a organizar la agenda médica.
+                        Aun no hay citas registradas. Crea la primera para empezar a organizar la agenda medica.
                     </td>
                 </tr>
                 {% endfor %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Agendar Cita | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Nueva cita</span>
+            <h1>Agendar cita</h1>
+            <p>Selecciona doctor, fecha y hora. El sistema valida automaticamente que el doctor este trabajando en ese horario.</p>
+        </div>
+    </div>
+
+    <form method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="DocCodigo" class="form-label">Doctor</label>
+                <select id="DocCodigo" name="DocCodigo" class="form-control" required>
+                    <option value="">Selecciona un doctor</option>
+                    {% for doctor in doctores %}
+                    <option value="{{ doctor.0 }}">{{ doctor.1 }} {{ doctor.2 }} - {{ doctor.3 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CitFecha" class="form-label">Fecha</label>
+                <input type="date" id="CitFecha" name="CitFecha" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="CitHora" class="form-label">Hora</label>
+                <input type="time" id="CitHora" name="CitHora" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="CitMotivo" class="form-label">Motivo</label>
+                <input type="text" id="CitMotivo" name="CitMotivo" class="form-control" placeholder="Consulta general, control, revision..." required>
+            </div>
+            <div class="col-12">
+                <label for="CitObservaciones" class="form-label">Observaciones</label>
+                <textarea id="CitObservaciones" name="CitObservaciones" class="form-control" rows="4" placeholder="Escribe sintomas, antecedentes o notas importantes."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-save">Confirmar cita</button>
+            <a href="{{ url_for('mis_citas') }}" class="btn btn-outline-soft">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

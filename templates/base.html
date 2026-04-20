@@ -18,29 +18,60 @@
                     <span class="brand-mark">H+</span>
                     <span class="brand-copy">
                         <span class="brand-title">ProHospital</span>
-                        <span class="brand-subtitle">Sistema de gestión hospitalaria</span>
+                        <span class="brand-subtitle">Sistema de gestion hospitalaria</span>
                     </span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Menú">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.rol == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/admin') %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">Panel admin</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/especialidad') %}active{% endif %}" href="{{ url_for('especialidad_index') }}">Especialidades</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/doctores') %}active{% endif %}" href="{{ url_for('doctores_index') }}">Doctores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/pacientes') %}active{% endif %}" href="{{ url_for('pacientes_index') }}">Pacientes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/horarios') %}active{% endif %}" href="{{ url_for('horarios_index') }}">Horarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/citas') or request.path.startswith('/historial') %}active{% endif %}" href="{{ url_for('citas_index') }}">Citas</a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/mi-panel') %}active{% endif %}" href="{{ url_for('mi_panel') }}">Mi panel</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/mi-citas') %}active{% endif %}" href="{{ url_for('mis_citas') }}">Mis citas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/mi-perfil') %}active{% endif %}" href="{{ url_for('mi_perfil') }}">Mi perfil</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path.startswith('/mi-historial') %}active{% endif %}" href="{{ url_for('mi_historial') }}">Historial</a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item user-chip">{{ current_user.nombre }}</li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-danger" href="{{ url_for('logout') }}">Cerrar sesion</a>
+                            </li>
+                        {% else %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.path.startswith('/especialidad') %}active{% endif %}" href="{{ url_for('especialidad_index') }}">Especialidades</a>
+                            <a class="nav-link {% if request.path.startswith('/login') %}active{% endif %}" href="{{ url_for('login') }}">Iniciar sesion</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path.startswith('/doctores') %}active{% endif %}" href="{{ url_for('doctores_index') }}">Doctores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path.startswith('/pacientes') %}active{% endif %}" href="{{ url_for('pacientes_index') }}">Pacientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path.startswith('/citas') %}active{% endif %}" href="{{ url_for('citas_index') }}">Citas</a>
-                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -49,6 +80,17 @@
 
     <main class="content-shell">
         <div class="container py-4 py-lg-5">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-stack">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category in ['success', 'danger', 'warning', 'info'] else 'info' }} alert-shell" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
             {% block content %}{% endblock %}
         </div>
     </main>

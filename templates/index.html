@@ -4,51 +4,54 @@
 
 {% block content %}
 <section class="hero-panel">
-    <span class="eyebrow">Panel principal</span>
-    <h1 class="hero-title">BIENVENIDOS A PROHOSPITAL</h1>
+    <span class="eyebrow">Bienvenido</span>
+    <h1 class="hero-title">ProHospital con acceso por roles</h1>
     <p class="hero-text">
-        Somos pioneros en brindar la más alta calidad para nuestros clientes!
+        El sistema ahora distingue entre administradores y pacientes. Cada uno entra a su propio panel con permisos y vistas adaptadas.
     </p>
     <div class="hero-actions mt-4">
-        <a href="{{ url_for('citas_index') }}" class="btn btn-brand">Gestionar citas</a>
-        <a href="{{ url_for('pacientes_index') }}" class="btn btn-outline-soft">Ver pacientes</a>
+        <a href="{{ url_for('login') }}" class="btn btn-brand">Iniciar sesion</a>
     </div>
 </section>
 
 <section class="summary-grid">
     <article class="summary-card">
-        <span>Módulos activos</span>
-        <strong>4</strong>
+        <span>Rol administrador</span>
+        <strong>Control total</strong>
+    </article>
+    <article class="summary-card">
+        <span>Rol paciente</span>
+        <strong>Experiencia personal</strong>
+    </article>
+    <article class="summary-card">
+        <span>Seguridad</span>
+        <strong>Rutas protegidas</strong>
     </article>
 </section>
 
 <section class="home-grid">
     <article class="home-card">
-        <span class="home-card-tag">Especialidades</span>
-        <h2>Organiza las áreas médicas</h2>
-        <p>Consulta, crea, edita y elimina especialidades desde una tabla más ordenada y visual.</p>
-        <a href="{{ url_for('especialidad_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+        <span class="home-card-tag">Administrador</span>
+        <h2>Gestion completa</h2>
+        <p>Puede administrar especialidades, doctores, pacientes, horarios medicos y todas las citas del sistema.</p>
     </article>
 
     <article class="home-card">
-        <span class="home-card-tag">Doctores</span>
-        <h2>Control del personal médico</h2>
-        <p>Mantén los datos del equipo médico accesibles con formularios más claros y consistentes.</p>
-        <a href="{{ url_for('doctores_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+        <span class="home-card-tag">Paciente</span>
+        <h2>Panel personal</h2>
+        <p>Puede ver sus citas, agendar una nueva, editar su perfil y revisar su historial de consultas.</p>
     </article>
 
     <article class="home-card">
-        <span class="home-card-tag">Pacientes</span>
-        <h2>Seguimiento de registros</h2>
-        <p>Gestiona la información de pacientes en una interfaz con mejor jerarquía visual y mejor lectura.</p>
-        <a href="{{ url_for('pacientes_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+        <span class="home-card-tag">Salud</span>
+        <h2>Perfil de salud</h2>
+        <p>El paciente puede guardar tipo de sangre, alergias y peso para futuras atenciones.</p>
     </article>
 
     <article class="home-card">
-        <span class="home-card-tag">Citas</span>
-        <h2>Agenda médica organizada</h2>
-        <p>Programa consultas con fecha, hora, estado y observaciones para darle seguimiento al día clínico.</p>
-        <a href="{{ url_for('citas_index') }}" class="btn btn-brand mt-3">Abrir módulo</a>
+        <span class="home-card-tag">Agenda</span>
+        <h2>Horarios medicos</h2>
+        <p>Las citas se validan contra la disponibilidad del doctor para evitar agendamientos fuera de turno.</p>
     </article>
 </section>
 {% endblock %}

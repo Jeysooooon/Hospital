@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Historial | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Consulta clinica</span>
+            <h1>Mi historial de consultas</h1>
+            <p>Revisa los diagnosticos y tratamientos que te han dejado en citas anteriores.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('mi_panel') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </div>
+
+    <div class="home-grid">
+        {% for item in historial %}
+        <article class="home-card">
+            <span class="home-card-tag">{{ item.CitFecha }} {{ item.CitHora }}</span>
+            <h2>{{ item.DoctorNombre }}</h2>
+            <p><strong>Especialidad:</strong> {{ item.DocEspecialidad }}</p>
+            <p><strong>Motivo:</strong> {{ item.CitMotivo }}</p>
+            <p><strong>Diagnostico:</strong> {{ item.HcDiagnostico }}</p>
+            <p><strong>Tratamiento:</strong> {{ item.HcTratamiento or 'Sin tratamiento registrado' }}</p>
+            <p><strong>Observaciones:</strong> {{ item.HcObservaciones or 'Sin observaciones adicionales' }}</p>
+        </article>
+        {% else %}
+        <div class="info-banner">Aun no tienes historial clinico registrado. Cuando un administrador o doctor agregue el diagnostico de una cita, aparecera aqui.</div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Historial Clinico | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Seguimiento medico</span>
+            <h1>Historial clinico de la cita</h1>
+            <p>Guarda el diagnostico y el tratamiento asociado a la cita seleccionada.</p>
+        </div>
+    </div>
+
+    <div class="confirm-grid mb-4">
+        <div class="confirm-item">
+            <span>Paciente</span>
+            <strong>{{ cita.PacienteNombre }}</strong>
+        </div>
+        <div class="confirm-item">
+            <span>Doctor</span>
+            <strong>{{ cita.DoctorNombre }}</strong>
+        </div>
+        <div class="confirm-item">
+            <span>Fecha y hora</span>
+            <strong>{{ cita.CitFecha }} {{ cita.CitHora }}</strong>
+        </div>
+        <div class="confirm-item">
+            <span>Motivo</span>
+            <strong>{{ cita.CitMotivo }}</strong>
+        </div>
+    </div>
+
+    <form method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-12">
+                <label for="HcDiagnostico" class="form-label">Diagnostico</label>
+                <textarea id="HcDiagnostico" name="HcDiagnostico" class="form-control" rows="4" required>{{ historial.HcDiagnostico if historial else '' }}</textarea>
+            </div>
+            <div class="col-12">
+                <label for="HcTratamiento" class="form-label">Tratamiento</label>
+                <textarea id="HcTratamiento" name="HcTratamiento" class="form-control" rows="4">{{ historial.HcTratamiento if historial else '' }}</textarea>
+            </div>
+            <div class="col-12">
+                <label for="HcObservaciones" class="form-label">Observaciones</label>
+                <textarea id="HcObservaciones" name="HcObservaciones" class="form-control" rows="4">{{ historial.HcObservaciones if historial else '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-brand">Guardar historial</button>
+            <a href="{{ url_for('citas_index') }}" class="btn btn-outline-soft">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

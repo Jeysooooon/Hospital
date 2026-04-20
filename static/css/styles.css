@@ -95,8 +95,39 @@ a {
     background: rgba(144, 213, 255, 0.42);
 }
 
+.nav-link-danger {
+    color: #8e2f2f;
+}
+
+.nav-link-danger:hover {
+    color: #8e2f2f;
+}
+
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(17, 17, 17, 0.06);
+    color: var(--color-text);
+    font-weight: 600;
+}
+
 .content-shell {
     position: relative;
+}
+
+.flash-stack {
+    display: grid;
+    gap: 0.8rem;
+    margin-bottom: 1.25rem;
+}
+
+.alert-shell {
+    margin-bottom: 0;
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 12px 24px rgba(41, 91, 124, 0.12);
 }
 
 .page-card,
@@ -104,7 +135,8 @@ a {
 .table-card,
 .form-card,
 .confirm-card,
-.home-card {
+.home-card,
+.auth-card {
     border: 1px solid var(--color-border);
     border-radius: 28px;
     background: var(--color-surface);
@@ -129,6 +161,15 @@ a {
     height: 220px;
     border-radius: 50%;
     background: rgba(119, 177, 212, 0.2);
+}
+
+.auth-shell {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.auth-card {
+    padding: 2rem;
 }
 
 .eyebrow {
@@ -339,6 +380,13 @@ a {
     font-size: 0.88rem;
 }
 
+.divider-title {
+    margin-bottom: 0.35rem;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
 .confirm-card {
     max-width: 760px;
     margin: 0 auto;
@@ -515,7 +563,8 @@ a {
     .hero-panel,
     .page-card,
     .form-card,
-    .confirm-card {
+    .confirm-card,
+    .auth-card {
         padding: 1.5rem;
     }
 
@@ -525,6 +574,11 @@ a {
 
     .nav-link {
         margin-left: 0;
+    }
+
+    .user-chip {
+        margin-top: 0.6rem;
+        justify-content: center;
     }
 }
 

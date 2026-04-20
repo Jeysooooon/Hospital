@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Citas | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Agenda personal</span>
+            <h1>Mis citas</h1>
+            <p>Aqui solo ves tus propias citas. Puedes revisar su estado y si ya tienen diagnostico agregado.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('mis_citas_agendar') }}" class="btn btn-brand">Agendar nueva cita</a>
+            <a href="{{ url_for('mi_panel') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Doctor</th>
+                    <th>Especialidad</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Historial</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas %}
+                <tr>
+                    <td class="text-strong">{{ cita.CitFecha }} {{ cita.CitHora }}</td>
+                    <td>{{ cita.DoctorNombre }}</td>
+                    <td>{{ cita.DocEspecialidad }}</td>
+                    <td class="stacked-text">
+                        <strong>{{ cita.CitMotivo }}</strong>
+                        <span>{{ cita.CitObservaciones or 'Sin observaciones' }}</span>
+                    </td>
+                    <td>{{ cita.CitEstado }}</td>
+                    <td>{{ 'Disponible' if cita.HcDiagnostico else 'Pendiente' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="empty-state">Todavia no tienes citas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

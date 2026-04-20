@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Panel | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Paciente</span>
+            <h1>Bienvenido, {{ profile.PacNombre }}</h1>
+            <p>Desde tu panel puedes revisar tus citas, ver tu historial clinico y mantener actualizado tu perfil de salud.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('mis_citas_agendar') }}" class="btn btn-brand">Agendar nueva cita</a>
+            <a href="{{ url_for('mi_perfil') }}" class="btn btn-outline-soft">Editar perfil</a>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <article class="summary-card">
+            <span>Tipo de sangre</span>
+            <strong>{{ profile.PacTipoSangre or 'No definido' }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Peso registrado</span>
+            <strong>{% if profile.PacPeso %}{{ profile.PacPeso }} kg{% else %}Sin dato{% endif %}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Alergias</span>
+            <strong>{{ 'Registradas' if profile.PacAlergias else 'Sin registro' }}</strong>
+        </article>
+    </div>
+</section>
+
+<section class="page-card mt-4">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Mis citas</span>
+            <h1>Ultimas citas</h1>
+            <p>Vista resumida de tus consultas mas recientes y su estado actual.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('mis_citas') }}" class="btn btn-outline-soft">Ver todas</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Doctor</th>
+                    <th>Especialidad</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas %}
+                <tr>
+                    <td class="text-strong">{{ cita.CitFecha }} {{ cita.CitHora }}</td>
+                    <td>{{ cita.DoctorNombre }}</td>
+                    <td>{{ cita.DocEspecialidad }}</td>
+                    <td>{{ cita.CitMotivo }}</td>
+                    <td>{{ cita.CitEstado }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-state">Todavia no tienes citas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="page-card mt-4">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Historial clinico</span>
+            <h1>Diagnosticos recientes</h1>
+            <p>Consulta rapidamente los ultimos diagnosticos guardados en tu expediente.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('mi_historial') }}" class="btn btn-outline-soft">Abrir historial completo</a>
+        </div>
+    </div>
+
+    <div class="home-grid">
+        {% for item in historial %}
+        <article class="home-card">
+            <span class="home-card-tag">{{ item.CitFecha }}</span>
+            <h2>{{ item.DoctorNombre }}</h2>
+            <p><strong>Diagnostico:</strong> {{ item.HcDiagnostico }}</p>
+            <p><strong>Tratamiento:</strong> {{ item.HcTratamiento or 'Sin tratamiento registrado' }}</p>
+        </article>
+        {% else %}
+        <div class="info-banner">Aun no tienes diagnosticos guardados en tu historial clinico.</div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

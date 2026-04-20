@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Admin | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Administrador</span>
+            <h1>Panel de control</h1>
+            <p>Desde aqui puedes gestionar especialidades, doctores, pacientes, horarios medicos, usuarios y todas las citas del sistema.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('citas_agregar') }}" class="btn btn-brand">Nueva cita</a>
+            <a href="{{ url_for('pacientes_agregar') }}" class="btn btn-outline-soft">Nuevo paciente</a>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <article class="summary-card">
+            <span>Especialidades</span>
+            <strong>{{ metrics.total_especialidades }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Doctores</span>
+            <strong>{{ metrics.total_doctores }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Pacientes</span>
+            <strong>{{ metrics.total_pacientes }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Citas</span>
+            <strong>{{ metrics.total_citas }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Usuarios</span>
+            <strong>{{ metrics.total_usuarios }}</strong>
+        </article>
+        <article class="summary-card">
+            <span>Historiales clinicos</span>
+            <strong>{{ metrics.total_historiales }}</strong>
+        </article>
+    </div>
+
+    <section class="home-grid">
+        <article class="home-card">
+            <span class="home-card-tag">Gestion</span>
+            <h2>Especialidades</h2>
+            <p>Administra las areas medicas activas del hospital.</p>
+            <a href="{{ url_for('especialidad_index') }}" class="btn btn-brand mt-3">Abrir modulo</a>
+        </article>
+        <article class="home-card">
+            <span class="home-card-tag">Gestion</span>
+            <h2>Doctores</h2>
+            <p>Consulta y actualiza el personal medico disponible.</p>
+            <a href="{{ url_for('doctores_index') }}" class="btn btn-brand mt-3">Abrir modulo</a>
+        </article>
+        <article class="home-card">
+            <span class="home-card-tag">Gestion</span>
+            <h2>Pacientes</h2>
+            <p>Crea pacientes y, si quieres, tambien sus credenciales de acceso.</p>
+            <a href="{{ url_for('pacientes_index') }}" class="btn btn-brand mt-3">Abrir modulo</a>
+        </article>
+        <article class="home-card">
+            <span class="home-card-tag">Agenda</span>
+            <h2>Horarios medicos</h2>
+            <p>Define los dias y horas disponibles para evitar citas fuera de turno.</p>
+            <a href="{{ url_for('horarios_index') }}" class="btn btn-brand mt-3">Configurar horarios</a>
+        </article>
+    </section>
+</section>
+
+<section class="page-card mt-4">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Seguimiento</span>
+            <h1>Proximas citas</h1>
+            <p>Vista rapida de las siguientes atenciones registradas en el sistema.</p>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Paciente</th>
+                    <th>Doctor</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in metrics.proximas_citas %}
+                <tr>
+                    <td class="text-strong">{{ cita.CitFecha }}</td>
+                    <td>{{ cita.CitHora }}</td>
+                    <td>{{ cita.PacienteNombre }}</td>
+                    <td>{{ cita.DoctorNombre }}</td>
+                    <td>{{ cita.CitEstado }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-state">Aun no hay citas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

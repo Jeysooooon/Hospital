@@ -6,13 +6,15 @@
 <section class="page-card narrow-page">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Actualización</span>
+            <span class="eyebrow">Actualizacion</span>
             <h1>Editar paciente</h1>
-            <p>Actualiza los datos del registro para conservar información correcta y bien presentada.</p>
+            <p>Actualiza la informacion general, el perfil de salud y los datos de acceso vinculados al paciente.</p>
         </div>
     </div>
 
     <form action="" method="POST" class="form-card">
+        <input type="hidden" name="UsuCodigo" value="{{ usuario.0 if usuario else '' }}">
+
         <div class="row g-4">
             <div class="col-md-6">
                 <label for="PacNombre" class="form-label">Nombre</label>
@@ -27,17 +29,47 @@
                 <input type="text" id="PacDNI" name="PacDNI" class="form-control" value="{{ paciente.3 }}" required>
             </div>
             <div class="col-md-6">
-                <label for="PacTelefono" class="form-label">Teléfono</label>
-                <input type="text" id="PacTelefono" name="PacTelefono" class="form-control" value="{{ paciente.4 }}">
+                <label for="PacTelefono" class="form-label">Telefono</label>
+                <input type="text" id="PacTelefono" name="PacTelefono" class="form-control" value="{{ paciente.4 or '' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="PacTipoSangre" class="form-label">Tipo de sangre</label>
+                <input type="text" id="PacTipoSangre" name="PacTipoSangre" class="form-control" value="{{ paciente.6 or '' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="PacPeso" class="form-label">Peso (kg)</label>
+                <input type="number" step="0.01" id="PacPeso" name="PacPeso" class="form-control" value="{{ paciente.8 or '' }}">
             </div>
             <div class="col-12">
-                <label for="PacDireccion" class="form-label">Dirección</label>
-                <textarea id="PacDireccion" name="PacDireccion" class="form-control" rows="4">{{ paciente.5 }}</textarea>
+                <label for="PacDireccion" class="form-label">Direccion</label>
+                <textarea id="PacDireccion" name="PacDireccion" class="form-control" rows="3">{{ paciente.5 or '' }}</textarea>
+            </div>
+            <div class="col-12">
+                <label for="PacAlergias" class="form-label">Alergias</label>
+                <textarea id="PacAlergias" name="PacAlergias" class="form-control" rows="3">{{ paciente.7 or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="divider-title mt-4">Acceso del paciente</div>
+        <p class="helper-text">Si ya existe usuario vinculado puedes actualizarlo aqui. Si aun no existe, llena usuario y contrasena para crearlo.</p>
+
+        <div class="row g-4 mt-1">
+            <div class="col-md-6">
+                <label for="UsuUsername" class="form-label">Usuario</label>
+                <input type="text" id="UsuUsername" name="UsuUsername" class="form-control" value="{{ usuario.1 if usuario else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label for="UsuCorreo" class="form-label">Correo</label>
+                <input type="email" id="UsuCorreo" name="UsuCorreo" class="form-control" value="{{ usuario.2 if usuario else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label for="UsuPassword" class="form-label">Nueva contrasena</label>
+                <input type="password" id="UsuPassword" name="UsuPassword" class="form-control" placeholder="Solo si deseas cambiarla o crear el acceso">
             </div>
         </div>
 
         <div class="form-actions mt-4">
-            <button type="submit" class="btn btn-brand">Actualizar información</button>
+            <button type="submit" class="btn btn-brand">Actualizar informacion</button>
             <a href="{{ url_for('pacientes_index') }}" class="btn btn-outline-soft">Cancelar</a>
         </div>
     </form>

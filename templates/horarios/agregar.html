@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Horario | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Nuevo horario</span>
+            <h1>Registrar horario medico</h1>
+            <p>Selecciona el doctor y define el tramo de horas disponible para recibir pacientes.</p>
+        </div>
+    </div>
+
+    <form method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="DocCodigo" class="form-label">Doctor</label>
+                <select id="DocCodigo" name="DocCodigo" class="form-control" required>
+                    <option value="">Selecciona un doctor</option>
+                    {% for doctor in doctores %}
+                    <option value="{{ doctor.0 }}">{{ doctor.1 }} {{ doctor.2 }} - {{ doctor.3 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="HorDiaSemana" class="form-label">Dia de la semana</label>
+                <select id="HorDiaSemana" name="HorDiaSemana" class="form-control" required>
+                    <option value="">Selecciona un dia</option>
+                    {% for dia in dias %}
+                    <option value="{{ dia }}">{{ dia|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="HorHoraInicio" class="form-label">Hora inicio</label>
+                <input type="time" id="HorHoraInicio" name="HorHoraInicio" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="HorHoraFin" class="form-label">Hora fin</label>
+                <input type="time" id="HorHoraFin" name="HorHoraFin" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-save">Guardar horario</button>
+            <a href="{{ url_for('horarios_index') }}" class="btn btn-outline-soft">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

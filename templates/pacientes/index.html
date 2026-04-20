@@ -6,13 +6,13 @@
 <section class="page-card">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Atención al paciente</span>
+            <span class="eyebrow">Atencion al paciente</span>
             <h1>Listado de pacientes</h1>
-            <p>Consulta la información de pacientes con mejor jerarquía visual, espacios más limpios y acciones más claras.</p>
+            <p>Consulta la informacion general y parte del perfil de salud, y crea accesos de login para cada paciente cuando sea necesario.</p>
         </div>
         <div class="section-actions">
             <a href="{{ url_for('pacientes_agregar') }}" class="btn btn-brand">Nuevo paciente</a>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-soft">Volver al inicio</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-soft">Volver al panel</a>
         </div>
     </div>
 
@@ -20,12 +20,12 @@
         <table class="table align-middle">
             <thead>
                 <tr>
-                    <th>Código</th>
+                    <th>Codigo</th>
                     <th>Nombre</th>
-                    <th>Apellido</th>
                     <th>DNI</th>
-                    <th>Teléfono</th>
-                    <th>Dirección</th>
+                    <th>Telefono</th>
+                    <th>Tipo sangre</th>
+                    <th>Peso</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -33,11 +33,14 @@
                 {% for pac in lista_pacientes %}
                 <tr>
                     <td class="text-strong">{{ pac.0 }}</td>
-                    <td class="text-strong">{{ pac.1 }}</td>
-                    <td>{{ pac.2 }}</td>
+                    <td class="stacked-text">
+                        <strong>{{ pac.1 }} {{ pac.2 }}</strong>
+                        <span>{{ pac.5 or 'Sin direccion registrada' }}</span>
+                    </td>
                     <td>{{ pac.3 }}</td>
-                    <td>{{ pac.4 }}</td>
-                    <td>{{ pac.5 }}</td>
+                    <td>{{ pac.4 or 'Sin telefono' }}</td>
+                    <td>{{ pac.6 or 'No definido' }}</td>
+                    <td>{% if pac.7 %}{{ pac.7 }} kg{% else %}Sin dato{% endif %}</td>
                     <td class="actions-cell">
                         <a href="{{ url_for('pacientes_editar', codigo=pac.0) }}" class="btn btn-edit btn-sm">Editar</a>
                         <a href="{{ url_for('pacientes_eliminar', codigo=pac.0) }}" class="btn btn-delete btn-sm">Eliminar</a>
@@ -45,7 +48,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="empty-state">Aún no hay pacientes registrados.</td>
+                    <td colspan="7" class="empty-state">Aun no hay pacientes registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

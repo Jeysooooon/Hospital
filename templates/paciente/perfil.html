@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Perfil personal</span>
+            <h1>Mi perfil y salud</h1>
+            <p>Actualiza tus datos basicos y deja guardada la informacion de salud que quieras tener disponible para futuras consultas.</p>
+        </div>
+    </div>
+
+    <form method="POST" class="form-card">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="PacNombre" class="form-label">Nombre</label>
+                <input type="text" id="PacNombre" name="PacNombre" class="form-control" value="{{ profile.PacNombre }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="PacApellido" class="form-label">Apellido</label>
+                <input type="text" id="PacApellido" name="PacApellido" class="form-control" value="{{ profile.PacApellido }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="PacDNI" class="form-label">Identidad</label>
+                <input type="text" id="PacDNI" name="PacDNI" class="form-control" value="{{ profile.PacDNI }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="PacTelefono" class="form-label">Telefono</label>
+                <input type="text" id="PacTelefono" name="PacTelefono" class="form-control" value="{{ profile.PacTelefono or '' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="PacTipoSangre" class="form-label">Tipo de sangre</label>
+                <input type="text" id="PacTipoSangre" name="PacTipoSangre" class="form-control" value="{{ profile.PacTipoSangre or '' }}" placeholder="O+, A-, AB+">
+            </div>
+            <div class="col-md-4">
+                <label for="PacPeso" class="form-label">Peso (kg)</label>
+                <input type="number" step="0.01" id="PacPeso" name="PacPeso" class="form-control" value="{{ profile.PacPeso or '' }}">
+            </div>
+            <div class="col-12">
+                <label for="PacDireccion" class="form-label">Direccion</label>
+                <textarea id="PacDireccion" name="PacDireccion" class="form-control" rows="3">{{ profile.PacDireccion or '' }}</textarea>
+            </div>
+            <div class="col-12">
+                <label for="PacAlergias" class="form-label">Alergias</label>
+                <textarea id="PacAlergias" name="PacAlergias" class="form-control" rows="4" placeholder="Medicamentos, alimentos o condiciones relevantes.">{{ profile.PacAlergias or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-brand">Guardar cambios</button>
+            <a href="{{ url_for('mi_panel') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

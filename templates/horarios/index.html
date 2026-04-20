@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Horarios Medicos | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Disponibilidad</span>
+            <h1>Horarios medicos</h1>
+            <p>Estos horarios son los que el sistema usa para validar si una cita se puede programar.</p>
+        </div>
+        <div class="section-actions">
+            <a href="{{ url_for('horarios_agregar') }}" class="btn btn-brand">Nuevo horario</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-soft">Volver al panel</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Especialidad</th>
+                    <th>Dia</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for horario in horarios %}
+                <tr>
+                    <td class="text-strong">{{ horario.DoctorNombre }}</td>
+                    <td>{{ horario.DocEspecialidad }}</td>
+                    <td>{{ horario.HorDiaSemana|title }}</td>
+                    <td>{{ horario.HorHoraInicio }}</td>
+                    <td>{{ horario.HorHoraFin }}</td>
+                    <td class="actions-cell">
+                        <a href="{{ url_for('horarios_eliminar', codigo=horario.HorCodigo) }}" class="btn btn-delete btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="empty-state">Aun no hay horarios medicos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

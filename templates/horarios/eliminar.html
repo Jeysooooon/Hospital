@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Horario | ProHospital{% endblock %}
+
+{% block content %}
+<section class="page-card narrow-page">
+    <div class="confirm-card danger-card">
+        <span class="warning-badge">Accion delicada</span>
+        <h1>Eliminar horario medico</h1>
+        <p>Confirma si deseas eliminar este horario. Las citas nuevas dejaran de permitirse en este rango.</p>
+
+        <div class="confirm-grid">
+            <div class="confirm-item">
+                <span>Doctor</span>
+                <strong>{{ horario.DoctorNombre }}</strong>
+            </div>
+            <div class="confirm-item">
+                <span>Dia</span>
+                <strong>{{ horario.HorDiaSemana|title }}</strong>
+            </div>
+            <div class="confirm-item">
+                <span>Horario</span>
+                <strong>{{ horario.HorHoraInicio }} - {{ horario.HorHoraFin }}</strong>
+            </div>
+        </div>
+
+        <form method="POST" class="form-actions mt-4">
+            <button type="submit" class="btn btn-delete">Si, eliminar</button>
+            <a href="{{ url_for('horarios_index') }}" class="btn btn-outline-soft">Cancelar</a>
+        </form>
+    </div>
+</section>
+{% endblock %}
