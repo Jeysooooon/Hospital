@@ -1,57 +1,154 @@
 {% extends "base.html" %}
 
 {% block title %}Inicio | ProHospital{% endblock %}
+{% block body_class %}page-home{% endblock %}
 
 {% block content %}
-<section class="hero-panel">
-    <span class="eyebrow">Bienvenido</span>
-    <h1 class="hero-title">ProHospital con acceso por roles</h1>
-    <p class="hero-text">
-        El sistema ahora distingue entre administradores y pacientes. Cada uno entra a su propio panel con permisos y vistas adaptadas.
-    </p>
-    <div class="hero-actions mt-4">
-        <a href="{{ url_for('login') }}" class="btn btn-brand">Iniciar sesion</a>
+<section class="hero-panel hero-landing">
+    <div class="hero-layout">
+        <div class="hero-copy">
+            <span class="eyebrow">Cuidado hospitalario moderno</span>
+            <h1 class="hero-title">Atencion clinica con una experiencia clara, humana y profesional</h1>
+            <p class="hero-text">
+                ProHospital organiza la gestion del hospital con una interfaz limpia inspirada en portales medicos modernos: agenda ordenada, acceso por roles y seguimiento de pacientes en un mismo sistema.
+            </p>
+            <div class="hero-actions">
+                <a href="{{ url_for('login') }}" class="btn btn-brand">Entrar al portal</a>
+                <a href="#servicios" class="btn btn-outline-soft">Explorar modulos</a>
+            </div>
+
+            <div class="metric-strip">
+                <article class="metric-card">
+                    <span>Acceso por roles</span>
+                    <strong>2 vistas</strong>
+                    <p>Administrador y paciente con recorridos distintos.</p>
+                </article>
+                <article class="metric-card">
+                    <span>Agenda central</span>
+                    <strong>24/7</strong>
+                    <p>Control de citas, horarios e historial desde un solo panel.</p>
+                </article>
+                <article class="metric-card">
+                    <span>Experiencia</span>
+                    <strong>Premium</strong>
+                    <p>Diseno luminoso, limpio y pensado para confianza clinica.</p>
+                </article>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-stack">
+                <div class="floating-note note-top">
+                    <span>Monitoreo</span>
+                    <strong>Agenda lista para el dia</strong>
+                </div>
+
+                <article class="visual-main-card">
+                    <span class="visual-kicker">Centro asistencial</span>
+                    <h2>Flujo de atencion ordenado y confiable</h2>
+                    <p>Recepcion, consulta, seguimiento y administracion conectados en una misma experiencia.</p>
+
+                    <div class="visual-grid">
+                        <div class="visual-tile">
+                            <span>Recepcion</span>
+                            <strong>Ingreso agil</strong>
+                        </div>
+                        <div class="visual-tile">
+                            <span>Consulta</span>
+                            <strong>Historial claro</strong>
+                        </div>
+                        <div class="visual-tile">
+                            <span>Agenda</span>
+                            <strong>Horarios sincronizados</strong>
+                        </div>
+                        <div class="visual-tile">
+                            <span>Paciente</span>
+                            <strong>Perfil de salud</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <div class="floating-note note-bottom">
+                    <span>Confianza</span>
+                    <strong>Entorno limpio, visual y hospitalario</strong>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="summary-grid">
-    <article class="summary-card">
-        <span>Rol administrador</span>
-        <strong>Control total</strong>
-    </article>
-    <article class="summary-card">
-        <span>Rol paciente</span>
-        <strong>Experiencia personal</strong>
-    </article>
-    <article class="summary-card">
-        <span>Seguridad</span>
-        <strong>Rutas protegidas</strong>
-    </article>
+<section class="page-card editorial-panel mt-4">
+    <div class="editorial-copy">
+        <span class="eyebrow">Excelencia medica</span>
+        <h2 class="panel-title">Una interfaz inspirada en hospitales modernos y centrada en el paciente</h2>
+        <p>
+            El sistema combina modulos administrativos con una presentacion mas editorial: tarjetas amplias, mucho espacio en blanco, acentos azules de confianza y bloques de informacion faciles de escanear.
+        </p>
+
+        <div class="checklist">
+            <div class="check-item">
+                <div>
+                    <strong>Gestion administrativa</strong>
+                    <p>Especialidades, doctores, pacientes, horarios y citas en una sola plataforma.</p>
+                </div>
+            </div>
+            <div class="check-item">
+                <div>
+                    <strong>Experiencia del paciente</strong>
+                    <p>Perfil personal, historial clinico y agenda propia con una navegacion mas amable.</p>
+                </div>
+            </div>
+            <div class="check-item">
+                <div>
+                    <strong>Lenguaje visual clinico</strong>
+                    <p>Blancos suaves, sombras ligeras y paneles tipo dashboard con caracter hospitalario.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="editorial-aside">
+        <span class="aside-label">Ruta de atencion</span>
+        <div class="care-flow">
+            <article class="flow-step">
+                <strong>01. Acceso</strong>
+                <span>Ingreso por rol con rutas protegidas y portal organizado.</span>
+            </article>
+            <article class="flow-step">
+                <strong>02. Coordinacion</strong>
+                <span>Agenda medica conectada con pacientes, horarios y estado de citas.</span>
+            </article>
+            <article class="flow-step">
+                <strong>03. Seguimiento</strong>
+                <span>Historial y perfil de salud listos para apoyar futuras consultas.</span>
+            </article>
+        </div>
+    </aside>
 </section>
 
-<section class="home-grid">
+<section class="home-grid mt-4" id="servicios">
     <article class="home-card">
         <span class="home-card-tag">Administrador</span>
-        <h2>Gestion completa</h2>
-        <p>Puede administrar especialidades, doctores, pacientes, horarios medicos y todas las citas del sistema.</p>
+        <h2>Centro de operaciones</h2>
+        <p>Control total de especialidades, doctores, pacientes y citas con una interfaz mas elegante y escaneable.</p>
     </article>
 
     <article class="home-card">
         <span class="home-card-tag">Paciente</span>
         <h2>Panel personal</h2>
-        <p>Puede ver sus citas, agendar una nueva, editar su perfil y revisar su historial de consultas.</p>
+        <p>Seguimiento de citas, perfil de salud e historial clinico con una experiencia visual mas clara y confiable.</p>
     </article>
 
     <article class="home-card">
         <span class="home-card-tag">Salud</span>
-        <h2>Perfil de salud</h2>
-        <p>El paciente puede guardar tipo de sangre, alergias y peso para futuras atenciones.</p>
+        <h2>Datos clinicos listos</h2>
+        <p>Tipo de sangre, alergias, peso y antecedentes accesibles para dar contexto a cada atencion.</p>
     </article>
 
     <article class="home-card">
         <span class="home-card-tag">Agenda</span>
-        <h2>Horarios medicos</h2>
-        <p>Las citas se validan contra la disponibilidad del doctor para evitar agendamientos fuera de turno.</p>
+        <h2>Horarios inteligentes</h2>
+        <p>Las citas se apoyan en la disponibilidad del doctor para reducir conflictos y mantener orden operativo.</p>
     </article>
 </section>
 {% endblock %}

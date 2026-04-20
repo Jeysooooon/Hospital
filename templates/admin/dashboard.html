@@ -1,71 +1,111 @@
 {% extends "base.html" %}
 
 {% block title %}Panel Admin | ProHospital{% endblock %}
+{% block body_class %}page-dashboard page-admin{% endblock %}
 
 {% block content %}
-<section class="page-card">
-    <div class="section-heading">
-        <div>
+<section class="hero-panel dashboard-hero">
+    <div class="hero-layout">
+        <div class="hero-copy">
             <span class="eyebrow">Administrador</span>
-            <h1>Panel de control</h1>
-            <p>Desde aqui puedes gestionar especialidades, doctores, pacientes, horarios medicos, usuarios y todas las citas del sistema.</p>
+            <h1 class="hero-title">Centro de control hospitalario</h1>
+            <p class="hero-text">Supervisa la operacion diaria con un panel mas visual: modulos conectados, metricas claras y acceso rapido a la agenda clinica.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('citas_agregar') }}" class="btn btn-brand">Nueva cita</a>
+                <a href="{{ url_for('pacientes_agregar') }}" class="btn btn-outline-soft">Nuevo paciente</a>
+            </div>
+
+            <div class="summary-grid mt-4">
+                <article class="summary-card">
+                    <span>Especialidades</span>
+                    <strong>{{ metrics.total_especialidades }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Doctores</span>
+                    <strong>{{ metrics.total_doctores }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Pacientes</span>
+                    <strong>{{ metrics.total_pacientes }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Citas</span>
+                    <strong>{{ metrics.total_citas }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Usuarios</span>
+                    <strong>{{ metrics.total_usuarios }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Historiales</span>
+                    <strong>{{ metrics.total_historiales }}</strong>
+                </article>
+            </div>
         </div>
-        <div class="section-actions">
-            <a href="{{ url_for('citas_agregar') }}" class="btn btn-brand">Nueva cita</a>
-            <a href="{{ url_for('pacientes_agregar') }}" class="btn btn-outline-soft">Nuevo paciente</a>
+
+        <div class="hero-visual">
+            <aside class="dashboard-sidecard">
+                <span class="dashboard-kicker">Operacion del dia</span>
+                <h2>Prioridades clinicas y administrativas</h2>
+                <p>Un bloque de mando pensado para revisar el movimiento del hospital antes de entrar a cada modulo.</p>
+
+                <div class="insight-list">
+                    <div class="insight-item">
+                        <span>Proximas citas</span>
+                        <strong>{{ metrics.proximas_citas|length }}</strong>
+                    </div>
+                    <div class="insight-item">
+                        <span>Pacientes activos</span>
+                        <strong>{{ metrics.total_pacientes }}</strong>
+                    </div>
+                    <div class="insight-item">
+                        <span>Equipo medico</span>
+                        <strong>{{ metrics.total_doctores }}</strong>
+                    </div>
+                </div>
+
+                <div class="dashboard-pill-row">
+                    <span class="dashboard-pill">Agenda ordenada</span>
+                    <span class="dashboard-pill">Seguimiento clinico</span>
+                    <span class="dashboard-pill">Control total</span>
+                </div>
+            </aside>
         </div>
     </div>
+</section>
 
-    <div class="summary-grid">
-        <article class="summary-card">
-            <span>Especialidades</span>
-            <strong>{{ metrics.total_especialidades }}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Doctores</span>
-            <strong>{{ metrics.total_doctores }}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Pacientes</span>
-            <strong>{{ metrics.total_pacientes }}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Citas</span>
-            <strong>{{ metrics.total_citas }}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Usuarios</span>
-            <strong>{{ metrics.total_usuarios }}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Historiales clinicos</span>
-            <strong>{{ metrics.total_historiales }}</strong>
-        </article>
+<section class="page-card mt-4">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Modulos clave</span>
+            <h1>Gestion por areas</h1>
+            <p>Accesos rapidos para coordinar el funcionamiento del hospital con una navegacion mas limpia.</p>
+        </div>
     </div>
 
     <section class="home-grid">
         <article class="home-card">
             <span class="home-card-tag">Gestion</span>
             <h2>Especialidades</h2>
-            <p>Administra las areas medicas activas del hospital.</p>
+            <p>Administra las areas medicas activas y mantenlas visibles para la operacion del centro.</p>
             <a href="{{ url_for('especialidad_index') }}" class="btn btn-brand mt-3">Abrir modulo</a>
         </article>
         <article class="home-card">
             <span class="home-card-tag">Gestion</span>
             <h2>Doctores</h2>
-            <p>Consulta y actualiza el personal medico disponible.</p>
+            <p>Consulta al personal medico, sus especialidades y la estructura clinica disponible.</p>
             <a href="{{ url_for('doctores_index') }}" class="btn btn-brand mt-3">Abrir modulo</a>
         </article>
         <article class="home-card">
             <span class="home-card-tag">Gestion</span>
             <h2>Pacientes</h2>
-            <p>Crea pacientes y, si quieres, tambien sus credenciales de acceso.</p>
+            <p>Registra nuevos pacientes y crea accesos para que entren a su portal personal.</p>
             <a href="{{ url_for('pacientes_index') }}" class="btn btn-brand mt-3">Abrir modulo</a>
         </article>
         <article class="home-card">
             <span class="home-card-tag">Agenda</span>
             <h2>Horarios medicos</h2>
-            <p>Define los dias y horas disponibles para evitar citas fuera de turno.</p>
+            <p>Sincroniza disponibilidad por doctor y protege la agenda frente a conflictos de turno.</p>
             <a href="{{ url_for('horarios_index') }}" class="btn btn-brand mt-3">Configurar horarios</a>
         </article>
     </section>
@@ -98,7 +138,17 @@
                     <td>{{ cita.CitHora }}</td>
                     <td>{{ cita.PacienteNombre }}</td>
                     <td>{{ cita.DoctorNombre }}</td>
-                    <td>{{ cita.CitEstado }}</td>
+                    <td>
+                        {% set estado = cita.CitEstado|lower %}
+                        <span class="status-badge
+                            {% if estado == 'programada' %}status-programada{% endif %}
+                            {% if estado == 'confirmada' %}status-confirmada{% endif %}
+                            {% if estado == 'completada' %}status-completada{% endif %}
+                            {% if estado == 'cancelada' %}status-cancelada{% endif %}
+                        ">
+                            {{ cita.CitEstado }}
+                        </span>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>

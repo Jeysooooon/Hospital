@@ -1,15 +1,33 @@
 {% extends "base.html" %}
 
 {% block title %}Login | ProHospital{% endblock %}
+{% block body_class %}page-login{% endblock %}
 
 {% block content %}
 <section class="auth-shell">
-    <div class="auth-card">
-        <span class="eyebrow">Acceso seguro</span>
-        <h1>Iniciar sesion</h1>
-        <p>Administradores y pacientes entran desde aqui. El sistema te redirige automaticamente al panel que corresponde a tu rol.</p>
+    <div class="auth-card auth-layout">
+        <div class="auth-copy">
+            <span class="eyebrow">Acceso seguro</span>
+            <h1>Portal clinico ProHospital</h1>
+            <p>Administradores y pacientes ingresan desde aqui. El sistema identifica tu rol y te lleva a una experiencia visual adaptada a tus tareas dentro del hospital.</p>
 
-        <form method="POST" class="form-card mt-4">
+            <div class="auth-benefits">
+                <article class="benefit-item">
+                    <strong>Agenda centralizada</strong>
+                    <span>Consulta horarios, citas y seguimiento clinico desde un mismo entorno.</span>
+                </article>
+                <article class="benefit-item">
+                    <strong>Diseno hospitalario</strong>
+                    <span>Interfaz clara, luminosa y mas confiable, inspirada en portales medicos modernos.</span>
+                </article>
+                <article class="benefit-item">
+                    <strong>Acceso por perfiles</strong>
+                    <span>Cada usuario entra a su panel con informacion y acciones relevantes.</span>
+                </article>
+            </div>
+        </div>
+
+        <form method="POST" class="form-card auth-form">
             <div class="row g-4">
                 <div class="col-12">
                     <label for="username" class="form-label">Usuario</label>

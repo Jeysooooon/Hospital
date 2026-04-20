@@ -1,34 +1,64 @@
 {% extends "base.html" %}
 
 {% block title %}Mi Panel | ProHospital{% endblock %}
+{% block body_class %}page-dashboard page-patient{% endblock %}
 
 {% block content %}
-<section class="page-card">
-    <div class="section-heading">
-        <div>
+<section class="hero-panel dashboard-hero">
+    <div class="hero-layout">
+        <div class="hero-copy">
             <span class="eyebrow">Paciente</span>
-            <h1>Bienvenido, {{ profile.PacNombre }}</h1>
-            <p>Desde tu panel puedes revisar tus citas, ver tu historial clinico y mantener actualizado tu perfil de salud.</p>
-        </div>
-        <div class="section-actions">
-            <a href="{{ url_for('mis_citas_agendar') }}" class="btn btn-brand">Agendar nueva cita</a>
-            <a href="{{ url_for('mi_perfil') }}" class="btn btn-outline-soft">Editar perfil</a>
-        </div>
-    </div>
+            <h1 class="hero-title">Bienvenido, {{ profile.PacNombre }}</h1>
+            <p class="hero-text">Tu panel ahora luce mas claro y hospitalario para que puedas revisar citas, historial y datos de salud con menos ruido visual.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('mis_citas_agendar') }}" class="btn btn-brand">Agendar nueva cita</a>
+                <a href="{{ url_for('mi_perfil') }}" class="btn btn-outline-soft">Editar perfil</a>
+            </div>
 
-    <div class="summary-grid">
-        <article class="summary-card">
-            <span>Tipo de sangre</span>
-            <strong>{{ profile.PacTipoSangre or 'No definido' }}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Peso registrado</span>
-            <strong>{% if profile.PacPeso %}{{ profile.PacPeso }} kg{% else %}Sin dato{% endif %}</strong>
-        </article>
-        <article class="summary-card">
-            <span>Alergias</span>
-            <strong>{{ 'Registradas' if profile.PacAlergias else 'Sin registro' }}</strong>
-        </article>
+            <div class="summary-grid mt-4">
+                <article class="summary-card">
+                    <span>Tipo de sangre</span>
+                    <strong>{{ profile.PacTipoSangre or 'No definido' }}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Peso registrado</span>
+                    <strong>{% if profile.PacPeso %}{{ profile.PacPeso }} kg{% else %}Sin dato{% endif %}</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Alergias</span>
+                    <strong>{{ 'Registradas' if profile.PacAlergias else 'Sin registro' }}</strong>
+                </article>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <aside class="dashboard-sidecard dashboard-sidecard-light">
+                <span class="dashboard-kicker">Tu seguimiento</span>
+                <h2>Estado general del paciente</h2>
+                <p>Acceso rapido a tu actividad reciente para mantener tus consultas y datos personales al dia.</p>
+
+                <div class="insight-list">
+                    <div class="insight-item">
+                        <span>Citas recientes</span>
+                        <strong>{{ citas|length }}</strong>
+                    </div>
+                    <div class="insight-item">
+                        <span>Diagnosticos visibles</span>
+                        <strong>{{ historial|length }}</strong>
+                    </div>
+                    <div class="insight-item">
+                        <span>Perfil de salud</span>
+                        <strong>{% if profile.PacAlergias or profile.PacTipoSangre or profile.PacPeso %}Actualizado{% else %}Basico{% endif %}</strong>
+                    </div>
+                </div>
+
+                <div class="dashboard-pill-row">
+                    <span class="dashboard-pill">Agenda personal</span>
+                    <span class="dashboard-pill">Historial clinico</span>
+                    <span class="dashboard-pill">Perfil seguro</span>
+                </div>
+            </aside>
+        </div>
     </div>
 </section>
 
@@ -62,7 +92,17 @@
                     <td>{{ cita.DoctorNombre }}</td>
                     <td>{{ cita.DocEspecialidad }}</td>
                     <td>{{ cita.CitMotivo }}</td>
-                    <td>{{ cita.CitEstado }}</td>
+                    <td>
+                        {% set estado = cita.CitEstado|lower %}
+                        <span class="status-badge
+                            {% if estado == 'programada' %}status-programada{% endif %}
+                            {% if estado == 'confirmada' %}status-confirmada{% endif %}
+                            {% if estado == 'completada' %}status-completada{% endif %}
+                            {% if estado == 'cancelada' %}status-cancelada{% endif %}
+                        ">
+                            {{ cita.CitEstado }}
+                        </span>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
