@@ -418,8 +418,13 @@ def get_pacientes_doctores(conn):
 
     cursor.execute(
         """
-        SELECT DocCodigo, DocNombre, DocApellido, DocEspecialidad
-        FROM doctores
+        SELECT
+            d.DocCodigo,
+            d.DocNombre,
+            d.DocApellido,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
+        FROM doctores d
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         ORDER BY DocNombre, DocApellido
         """
     )
@@ -466,6 +471,41 @@ def username_exists(conn, username, exclude_user_id=None):
     exists = cursor.fetchone() is not None
     cursor.close()
     return exists
+
+
+def normalize_optional_form_value(value):
+    if value is None:
+        return None
+
+    cleaned_value = value.strip() if isinstance(value, str) else str(value).strip()
+    if not cleaned_value or cleaned_value.lower() in {"none", "null", "undefined"}:
+        return None
+    return cleaned_value
+
+
+def parse_optional_int_form_value(value):
+    cleaned_value = normalize_optional_form_value(value)
+    if cleaned_value is None:
+        return None
+
+    try:
+        return int(cleaned_value)
+    except (TypeError, ValueError):
+        return None
+
+
+def get_especialidades_catalog(conn):
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        SELECT EspCodigo, EspNombre
+        FROM especialidad
+        ORDER BY EspNombre
+        """
+    )
+    especialidades = cursor.fetchall()
+    cursor.close()
+    return especialidades
 
 
 def doctor_schedule_message(conn, doc_codigo, fecha, hora, cita_excluir=None):
@@ -551,10 +591,11 @@ def get_patient_appointments(conn, pac_codigo):
             c.CitMotivo,
             c.CitObservaciones,
             CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad,
             hc.HcDiagnostico
         FROM citas c
         INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         LEFT JOIN historial_clinico hc ON c.CitCodigo = hc.CitCodigo
         WHERE c.PacCodigo = %s
         ORDER BY c.CitFecha DESC, c.CitHora DESC
@@ -581,10 +622,11 @@ def get_patient_history(conn, pac_codigo):
             c.CitHora,
             c.CitMotivo,
             CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
         FROM historial_clinico hc
         INNER JOIN citas c ON hc.CitCodigo = c.CitCodigo
         INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         WHERE c.PacCodigo = %s
         ORDER BY c.CitFecha DESC, c.CitHora DESC
         """
@@ -604,10 +646,11 @@ def get_doctor_profile(conn, doc_codigo):
             DocCodigo,
             DocNombre,
             DocApellido,
-            DocEspecialidad,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(doctores.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad,
             DocTelefono,
             DocCorreo
         FROM doctores
+        LEFT JOIN especialidad e ON doctores.DocEspecialidad = e.EspCodigo
         WHERE DocCodigo = %s
         """,
         (doc_codigo,),
@@ -778,9 +821,10 @@ def get_patient_consultations(conn, pac_codigo):
             hc.HcTratamiento,
             hc.HcObservaciones,
             CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
         FROM citas c
         INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         LEFT JOIN historial_clinico hc ON c.CitCodigo = hc.CitCodigo
         WHERE c.PacCodigo = %s
         ORDER BY c.CitFecha DESC, c.CitHora DESC
@@ -968,8 +1012,13 @@ def mis_citas_agendar():
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT DocCodigo, DocNombre, DocApellido, DocEspecialidad
-        FROM doctores
+        SELECT
+            d.DocCodigo,
+            d.DocNombre,
+            d.DocApellido,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
+        FROM doctores d
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         ORDER BY DocNombre, DocApellido
         """
     )
@@ -1317,12 +1366,13 @@ def doctores_index():
             d.DocCodigo,
             d.DocNombre,
             d.DocApellido,
-            d.DocEspecialidad,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad,
             d.DocTelefono,
             d.DocCorreo,
             u.UsuCodigo,
             u.UsuUsername
         FROM doctores d
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         LEFT JOIN usuarios u ON d.DocCodigo = u.DocCodigo AND u.UsuRol = 'doctor'
         ORDER BY d.DocNombre, d.DocApellido
         """
@@ -1337,29 +1387,37 @@ def doctores_index():
 @login_required
 @admin_required
 def doctores_agregar():
+    conn = get_db_connection()
+    especialidades = get_especialidades_catalog(conn)
+
     if request.method == "POST":
-        conn = get_db_connection()
         cursor = conn.cursor()
         nombre = request.form["DocNombre"]
         apellido = request.form["DocApellido"]
-        especialidad = request.form["DocEspecialidad"]
+        especialidad = parse_optional_int_form_value(request.form.get("DocEspecialidad"))
         telefono = request.form["DocTelefono"]
         correo = request.form["DocCorreo"]
         usuario = request.form["UsuUsername"].strip()
         correo_usuario = request.form["UsuCorreo"].strip()
         password = request.form["UsuPassword"]
 
+        if especialidad is None:
+            cursor.close()
+            conn.close()
+            flash("Selecciona una especialidad valida para el doctor.", "danger")
+            return render_template("doctores/agregar.html", especialidades=especialidades)
+
         if (usuario and not password) or (password and not usuario):
             cursor.close()
             conn.close()
             flash("Para crear el acceso del doctor debes indicar usuario y contrasena.", "danger")
-            return render_template("doctores/agregar.html")
+            return render_template("doctores/agregar.html", especialidades=especialidades)
 
         if usuario and username_exists(conn, usuario):
             cursor.close()
             conn.close()
             flash("Ese nombre de usuario ya esta en uso.", "danger")
-            return render_template("doctores/agregar.html")
+            return render_template("doctores/agregar.html", especialidades=especialidades)
 
         cursor.execute(
             """
@@ -1406,15 +1464,18 @@ def doctores_agregar():
         conn.close()
         flash("Doctor agregado correctamente.", "success")
         return redirect(url_for("doctores_index"))
-    return render_template("doctores/agregar.html")
+    conn.close()
+    return render_template("doctores/agregar.html", especialidades=especialidades)
 
 
 @app.route("/doctores/editar/<string:codigo>", methods=["GET", "POST"])
 @login_required
 @admin_required
 def doctores_editar(codigo):
+    conn = get_db_connection()
+    especialidades = get_especialidades_catalog(conn)
+
     if request.method == "GET":
-        conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             """
@@ -1422,13 +1483,15 @@ def doctores_editar(codigo):
                 d.DocCodigo,
                 d.DocNombre,
                 d.DocApellido,
-                d.DocEspecialidad,
+                d.DocEspecialidad AS DocEspecialidadCodigo,
+                COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidadNombre,
                 d.DocTelefono,
                 d.DocCorreo,
                 u.UsuCodigo,
                 u.UsuUsername,
                 IFNULL(u.UsuCorreo, '') AS UsuCorreo
             FROM doctores d
+            LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
             LEFT JOIN usuarios u ON d.DocCodigo = u.DocCodigo AND u.UsuRol = 'doctor'
             WHERE d.DocCodigo = %s
             LIMIT 1
@@ -1438,19 +1501,24 @@ def doctores_editar(codigo):
         doctor = cursor.fetchone()
         cursor.close()
         conn.close()
-        return render_template("doctores/editar.html", doctor=doctor)
+        return render_template("doctores/editar.html", doctor=doctor, especialidades=especialidades)
 
-    conn = get_db_connection()
     cursor = conn.cursor()
     nombre = request.form["DocNombre"]
     apellido = request.form["DocApellido"]
-    especialidad = request.form["DocEspecialidad"]
+    especialidad = parse_optional_int_form_value(request.form.get("DocEspecialidad"))
     telefono = request.form["DocTelefono"]
     correo = request.form["DocCorreo"]
     usu_codigo = request.form["UsuCodigo"] or None
     usuario = request.form["UsuUsername"].strip()
     correo_usuario = request.form["UsuCorreo"].strip()
     password = request.form["UsuPassword"]
+
+    if especialidad is None:
+        cursor.close()
+        conn.close()
+        flash("Selecciona una especialidad valida para el doctor.", "danger")
+        return redirect(url_for("doctores_editar", codigo=codigo))
 
     if (usuario and not usu_codigo and not password) or (password and not usuario):
         cursor.close()
@@ -1553,12 +1621,13 @@ def doctores_eliminar(codigo):
         cursor.execute(
             """
             SELECT
-                DocCodigo,
-                DocNombre,
-                DocApellido,
-                DocEspecialidad
-            FROM doctores
-            WHERE DocCodigo = %s
+                d.DocCodigo,
+                d.DocNombre,
+                d.DocApellido,
+                COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
+            FROM doctores d
+            LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
+            WHERE d.DocCodigo = %s
             """,
             (codigo,),
         )
@@ -1870,11 +1939,12 @@ def citas_index():
             CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
             d.DocCodigo,
             CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad,
             hc.HcCodigo
         FROM citas c
         INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
         INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         LEFT JOIN historial_clinico hc ON c.CitCodigo = hc.CitCodigo
         ORDER BY c.CitFecha ASC, c.CitHora ASC
     """
@@ -2088,9 +2158,10 @@ def horarios_index():
             h.HorHoraFin,
             h.HorActivo,
             CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
         FROM horarios_medicos h
         INNER JOIN doctores d ON h.DocCodigo = d.DocCodigo
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         ORDER BY d.DocNombre, h.HorDiaSemana, h.HorHoraInicio
         """
     )
@@ -2108,8 +2179,13 @@ def horarios_agregar():
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT DocCodigo, DocNombre, DocApellido, DocEspecialidad
-        FROM doctores
+        SELECT
+            d.DocCodigo,
+            d.DocNombre,
+            d.DocApellido,
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
+        FROM doctores d
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         ORDER BY DocNombre, DocApellido
         """
     )
@@ -2202,10 +2278,11 @@ def historial_editar(codigo):
             c.CitMotivo,
             CONCAT(p.PacNombre, ' ', p.PacApellido) AS PacienteNombre,
             CONCAT(d.DocNombre, ' ', d.DocApellido) AS DoctorNombre,
-            d.DocEspecialidad
+            COALESCE(e.EspNombre, NULLIF(TRIM(CAST(d.DocEspecialidad AS CHAR)), '')) AS DocEspecialidad
         FROM citas c
         INNER JOIN pacientes p ON c.PacCodigo = p.PacCodigo
         INNER JOIN doctores d ON c.DocCodigo = d.DocCodigo
+        LEFT JOIN especialidad e ON d.DocEspecialidad = e.EspCodigo
         WHERE c.CitCodigo = %s
     """
     params = [codigo]

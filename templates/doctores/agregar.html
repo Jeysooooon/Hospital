@@ -24,7 +24,12 @@
             </div>
             <div class="col-md-6">
                 <label for="DocEspecialidad" class="form-label">Especialidad</label>
-                <input type="text" id="DocEspecialidad" name="DocEspecialidad" class="form-control" required>
+                <select id="DocEspecialidad" name="DocEspecialidad" class="form-control" required>
+                    <option value="">Selecciona una especialidad</option>
+                    {% for especialidad in especialidades %}
+                    <option value="{{ especialidad.EspCodigo }}">{{ especialidad.EspNombre }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-6">
                 <label for="DocTelefono" class="form-label">Telefono</label>
