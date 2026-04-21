@@ -5,48 +5,49 @@
 
 {% block content %}
 <section class="auth-shell">
-    <div class="auth-card auth-layout">
-        <div class="auth-copy">
-            <span class="eyebrow">Acceso seguro</span>
-            <h1>Portal clinico ProHospital</h1>
-            <p>Administradores, pacientes y doctores ingresan desde aqui. Cada perfil aterriza en un panel propio con accesos acordes a su trabajo dentro del sistema.</p>
-
-            <div class="doctor-showcase">
-                <img src="{{ url_for('static', filename='img/doctor-hero.svg') }}" alt="Ilustracion de doctor para la pantalla de acceso" class="doctor-illustration">
+    <div class="auth-card auth-layout auth-layout-split">
+        <form method="POST" class="form-card auth-form auth-form-minimal">
+            <div class="auth-form-head">
+                <span class="eyebrow">Acceso seguro</span>
+                <h1>Inicia sesion</h1>
+                <p>Portal central de ProHospital.</p>
             </div>
 
-            <div class="auth-benefits">
-                <article class="benefit-item">
-                    <strong>Agenda centralizada</strong>
-                    <span>Consulta horarios, citas y seguimiento clinico desde un mismo entorno.</span>
-                </article>
-                <article class="benefit-item">
-                    <strong>Diseno hospitalario</strong>
-                    <span>Interfaz clara, luminosa y mas confiable, inspirada en portales medicos modernos.</span>
-                </article>
-                <article class="benefit-item">
-                    <strong>Acceso por perfiles</strong>
-                    <span>Cada usuario entra a su panel con informacion y acciones relevantes, incluida la agenda clinica del doctor.</span>
-                </article>
-            </div>
-        </div>
-
-        <form method="POST" class="form-card auth-form">
             <div class="row g-4">
                 <div class="col-12">
                     <label for="username" class="form-label">Usuario</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="admin, doctor.lopez o usuario del paciente" required>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Usuario" required>
                 </div>
                 <div class="col-12">
                     <label for="password" class="form-label">Contrasena</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Contrasena" required>
                 </div>
             </div>
 
+            <div class="auth-meta">
+                <span>Admin, doctor o paciente</span>
+                <a href="{{ url_for('index') }}">Volver al inicio</a>
+            </div>
+
             <div class="form-actions mt-4">
-                <button type="submit" class="btn btn-brand">Entrar al sistema</button>
+                <button type="submit" class="btn btn-brand auth-submit">Entrar</button>
             </div>
         </form>
+
+        <div class="auth-copy auth-copy-brand">
+            <div class="auth-brand-panel">
+                <span class="auth-side-label">Welcome to</span>
+                <div class="auth-brand-icon">PH</div>
+                <h2>ProHospital</h2>
+                <p>Gestion hospitalaria simple, clara y segura.</p>
+
+                <div class="auth-role-strip">
+                    <span>Admin</span>
+                    <span>Doctor</span>
+                    <span>Paciente</span>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

@@ -4,150 +4,116 @@
 {% block body_class %}page-home{% endblock %}
 
 {% block content %}
-<section class="hero-panel hero-landing">
-    <div class="hero-layout">
-        <div class="hero-copy">
-            <span class="eyebrow">Hospital &amp; Medical Clinic</span>
-            <h1 class="hero-title">Atencion hospitalaria moderna con una portada mas humana, clinica y confiable</h1>
+<section class="home-hero">
+    <div class="landing-grid">
+        <div class="landing-copy">
+            <span class="eyebrow">Plataforma hospitalaria</span>
+            <h1 class="hero-title">Coordina la atencion clinica sin una interfaz cargada.</h1>
             <p class="hero-text">
-                ProHospital ahora presenta una identidad visual inspirada en centros medicos modernos: tonos azules profundos, superficies limpias y una presencia medica clara desde el primer vistazo para transmitir orden, seguridad y confianza.
+                ProHospital concentra accesos, agenda y seguimiento en una portada limpia, con jerarquia clara y una presencia visual mas actual.
             </p>
             <div class="hero-actions">
-                <a href="{{ url_for('login') }}" class="btn btn-brand">Entrar al portal</a>
-                <a href="#servicios" class="btn btn-outline-soft">Explorar modulos</a>
-            </div>
-
-            <div class="hero-chip-row">
-                <span class="hero-chip">Urgencias 24/7</span>
-                <span class="hero-chip">Agenda centralizada</span>
-                <span class="hero-chip">Seguimiento clinico seguro</span>
-            </div>
-
-            <div class="metric-strip">
-                <article class="metric-card">
-                    <span>Portal hospitalario</span>
-                    <strong>1 entorno</strong>
-                    <p>Operacion administrativa y seguimiento del paciente desde una misma identidad visual.</p>
-                </article>
-                <article class="metric-card">
-                    <span>Agenda medica</span>
-                    <strong>24/7</strong>
-                    <p>Consulta citas, horarios, perfiles y diagnosticos con una navegacion mas clara.</p>
-                </article>
-                <article class="metric-card">
-                    <span>Diseno</span>
-                    <strong>Hospitalario</strong>
-                    <p>Inspirado en tu referencia: azules intensos, tarjetas limpias y presencia medica en la portada.</p>
-                </article>
+                <a href="{{ url_for('login') }}" class="btn btn-brand">Entrar</a>
+                <a href="#servicios" class="btn btn-outline-soft">Ver modulos</a>
             </div>
         </div>
 
-        <div class="hero-visual">
-            <div class="hero-visual-shell">
-                <div class="floating-note note-top">
-                    <span>Monitoreo</span>
-                    <strong>Centro activo y listo para atender</strong>
+        <div class="hero-panel hero-landing">
+            <div class="hero-stage">
+                <div class="hero-stage-head">
+                    <span class="hero-stage-brand">ProHospital</span>
+                    <a href="{{ url_for('login') }}" class="hero-stage-link">Login</a>
                 </div>
 
-                <div class="doctor-showcase">
-                    <img src="{{ url_for('static', filename='img/doctor-hero.svg') }}" alt="Ilustracion medica de doctor con bata y portapapeles" class="doctor-illustration">
-                </div>
-
-                <article class="hero-info-card">
-                    <span class="home-card-tag">Inicio hospitalario</span>
-                    <h3>Recepcion, agenda y seguimiento en una misma experiencia</h3>
-                    <p>La portada toma la forma y los colores del doctor de referencia para marcar el tono visual de todo el sistema.</p>
-
-                    <div class="hero-cta-note">
-                        <div>
-                            <span>Disponibilidad</span>
-                            <strong>Lunes a Sabado</strong>
-                        </div>
-                        <a href="{{ url_for('login') }}" class="btn btn-brand btn-sm">Ingresar</a>
+                <div class="hero-stage-body">
+                    <div>
+                        <span class="hero-stage-kicker">Inicio</span>
+                        <h2>Mejor flujo clinico. Menos friccion.</h2>
+                        <p>Una portada pensada para dar acceso rapido a los modulos clave del sistema.</p>
+                        <a href="{{ url_for('login') }}" class="btn btn-brand btn-sm">Acceder</a>
                     </div>
-                </article>
 
-                <div class="floating-note note-bottom">
-                    <span>Confianza</span>
-                    <strong>Estilo clinico mas llamativo y profesional</strong>
+                    <div class="hero-stage-preview">
+                        <article class="preview-card">
+                            <span>Agenda</span>
+                            <strong>Citas y horarios</strong>
+                        </article>
+                        <article class="preview-card">
+                            <span>Pacientes</span>
+                            <strong>Perfiles y seguimiento</strong>
+                        </article>
+                        <article class="preview-card">
+                            <span>Operacion</span>
+                            <strong>Paneles por rol</strong>
+                        </article>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="page-card editorial-panel mt-4">
+<section class="trust-band">
+    <span>Acceso por roles</span>
+    <span>Agenda centralizada</span>
+    <span>Historial clinico</span>
+    <span>Interfaz ligera</span>
+</section>
+
+<section class="page-card editorial-panel" id="servicios">
     <div class="editorial-copy">
-        <span class="eyebrow">Excelencia medica</span>
-        <h2 class="panel-title">Una experiencia visual pensada para parecer un portal hospitalario real desde el Inicio</h2>
+        <span class="eyebrow">Estructura clara</span>
+        <h2 class="panel-title">Un inicio mas limpio para moverte rapido dentro del sistema</h2>
         <p>
-            El nuevo diseno combina tarjetas amplias, superficies limpias, gradientes medicos y bloques informativos que ayudan a recorrer el sistema con rapidez. La portada ahora se apoya en una ilustracion clinica protagonista para marcar una identidad mas fuerte y memorable.
+            La portada toma la estructura editorial de tu referencia: encabezado simple, bloque protagonista, banda de confianza y secciones ordenadas con poco texto.
         </p>
 
-        <div class="checklist">
-            <div class="check-item">
-                <div>
-                    <strong>Identidad hospitalaria consistente</strong>
-                    <p>Navegacion, tablas, formularios y dashboards comparten la misma paleta azul, sombras suaves y lenguaje visual clinico.</p>
-                </div>
-            </div>
-            <div class="check-item">
-                <div>
-                    <strong>Inicio centrado en la ilustracion medica</strong>
-                    <p>La figura del doctor funciona como ancla visual principal para reforzar confianza y relacionar el sistema con atencion sanitaria.</p>
-                </div>
-            </div>
-            <div class="check-item">
-                <div>
-                    <strong>Jerarquia mas clara</strong>
-                    <p>Botones, metricas, modulos y accesos rapidos ahora resaltan mejor para que el flujo diario sea mas facil de escanear.</p>
-                </div>
-            </div>
+        <div class="feature-stack">
+            <article class="feature-card">
+                <span class="home-card-tag">Admin</span>
+                <h3>Controla especialidades, doctores, pacientes y citas.</h3>
+            </article>
+            <article class="feature-card">
+                <span class="home-card-tag">Doctor</span>
+                <h3>Consulta agenda, historial y pacientes desde un mismo panel.</h3>
+            </article>
         </div>
     </div>
 
     <aside class="editorial-aside">
-        <span class="aside-label">Ruta de atencion</span>
+        <span class="aside-label">Bloques principales</span>
         <div class="care-flow">
             <article class="flow-step">
-                <strong>01. Ingreso seguro</strong>
-                <span>El usuario entra al portal con una portada medica mas fuerte y una navegacion mas limpia.</span>
+                <strong>01. Entrada segura</strong>
+                <span>Login sobrio y directo para todos los perfiles.</span>
             </article>
             <article class="flow-step">
-                <strong>02. Coordinacion clinica</strong>
-                <span>Citas, horarios y perfiles de salud se mantienen conectados para ordenar la operacion diaria.</span>
+                <strong>02. Navegacion simple</strong>
+                <span>Modulos visibles sin sobrecargar la portada.</span>
             </article>
             <article class="flow-step">
                 <strong>03. Seguimiento continuo</strong>
-                <span>El historial clinico y la informacion del paciente quedan visibles en una experiencia mas entendible.</span>
+                <span>Citas e historial con lectura mas ordenada.</span>
             </article>
         </div>
     </aside>
 </section>
 
-<section class="home-grid mt-4" id="servicios">
-    <article class="home-card">
+<section class="role-grid mt-4">
+    <article class="home-card role-card">
         <span class="home-card-tag">Administrador</span>
-        <h2>Centro de mando hospitalario</h2>
-        <p>Gestiona especialidades, doctores, horarios y citas desde tarjetas mas visuales y mejor jerarquizadas.</p>
+        <h2>Centro de gestion</h2>
+        <p>Supervisa usuarios, medicos, horarios y citas con una vista coherente y directa.</p>
     </article>
-
-    <article class="home-card">
+    <article class="home-card role-card">
+        <span class="home-card-tag">Doctor</span>
+        <h2>Agenda profesional</h2>
+        <p>Revisa consultas, horarios y pacientes desde una interfaz clara y enfocada.</p>
+    </article>
+    <article class="home-card role-card">
         <span class="home-card-tag">Paciente</span>
-        <h2>Portal personal de salud</h2>
-        <p>El paciente revisa citas, historial y perfil con una experiencia mas cercana al estilo de una clinica moderna.</p>
-    </article>
-
-    <article class="home-card">
-        <span class="home-card-tag">Historial</span>
-        <h2>Datos clinicos listos</h2>
-        <p>Tipo de sangre, alergias, diagnosticos y antecedentes quedan mejor presentados para apoyar cada consulta.</p>
-    </article>
-
-    <article class="home-card">
-        <span class="home-card-tag">Agenda</span>
-        <h2>Horarios sincronizados</h2>
-        <p>La disponibilidad del doctor se refleja en las citas para mantener orden operativo y evitar cruces.</p>
+        <h2>Portal personal</h2>
+        <p>Consulta tus citas, perfil e historial clinico en un entorno mas limpio.</p>
     </article>
 </section>
 {% endblock %}
